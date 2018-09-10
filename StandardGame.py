@@ -4,7 +4,7 @@ from itertools import product as crossproduct
 from random import randint, shuffle
 import numpy as np
 
-Tile = namedtuple('Tile', 'value color id')
+Tile = namedtuple('Tile', 'rank color id')
 GameDelta = type('GameDelta', (object,), {})
 
 class Game(object):
@@ -14,37 +14,38 @@ class Game(object):
 
     """
 
-    TILE_VALUES = (0, 1, 2, 3, 4)
-    TILE_COLORS = (0, 1, 2, 3, 4)
-    N_VALUES    = len(TILE_VALUES)
-    N_COLORS    = len(TILE_COLORS)
-    # list of all unique tile types (= TILE_VALUES x TILE_COLORS)
+    RANKS    = (0, 1, 2, 3, 4)
+    COLORS   = (0, 1, 2, 3, 4)
+    N_RANKS  = len(RANKS)
+    N_COLORS = len(COLORS)
+    # list of all unique tile types (= RANKS x COLORS)
     # to translate between tile type and tile index, the formulat is
-    # tileId = value * 5 + color
-    TILE_TYPES  = tuple(Tile(t[0], t[1], 5 * t[0] + t[1]) for t in crossproduct(TILE_VALUES, TILE_COLORS))
-    N_TYPES     = len(TILE_TYPES)
-    # Number of tile for each value of a color. E.g there are only 1 Five of each color, 
-    # so Game.N_TILES_PER_VALUE[5] = 1.
-    N_TILES_PER_VALUE = (3, 2, 2, 2, 1)
+    # tileId = rank * 5 + color
+    TILE_TYPES = tuple(Tile(t[0], t[1], 5 * t[0] + t[1]) for t in crossproduct(RANKS, COLORS))
+    N_TYPES    = len(TILE_TYPES)
+    # Number of tile for each rank of a color. E.g there are only 1 Five of each color, 
+    # so Game.N_TILES_PER_RANK[4] = 1.
+    N_TILES_PER_RANK = (3, 2, 2, 2, 1)
+    # e.g if there are 4 players, hand size = HAND_SIZE_PER_N_PLAYERS[4] = 4
     HAND_SIZE_PER_N_PLAYERS = (None, None, 5, 5, 4, 4)
 
     # Hint mask
-    HINT_ALL_VALUES = ((1 << N_VALUES) - 1) << N_COLORS
+    HINT_ALL_RANKS  = ((1 << N_RANKS) - 1) << N_COLORS
     HINT_ALL_COLORS = (1 << N_COLORS) - 1
-    HINT_ALL    = HINT_ALL_VALUES | HINT_ALL_COLORS
-    HINT_COLORS = tuple(1 << i for i in range(0, N_COLORS))
-    HINT_VALUES = tuple(1 << i for i in range(N_COLORS, N_COLORS + N_VALUES))
+    HINT_ALL        = HINT_ALL_RANKS | HINT_ALL_COLORS
+    HINT_COLORS     = tuple(1 << i for i in range(0, N_COLORS))
+    HINT_RANKS      = tuple(1 << i for i in range(N_COLORS, N_COLORS + N_RANKS))
 
 
     def __init__(self, nPlayers):
         # keep count of each tile type
-        self.nTypeInPlay = [Game.N_TILES_PER_VALUE[t.value] for t in Game.TILE_TYPES]
+        self.nTypeInPlay = [Game.N_TILES_PER_RANK[t.rank] for t in Game.TILE_TYPES]
 
         # initial deck, containing all tiles
         # each tile is represented by a number, which is the index of the type in Game.TILE_TYPES list
         # as tiles are drawn, deck get shuffled and partitioned into undrawn pile (index 0 to deckSize-1)
         # and drawn pile (index deckSize or greater)
-        self.deck = [t for t in Game.TILE_TYPES for j in range(0, Game.N_TILES_PER_VALUE[t.value]) ]
+        self.deck = [t for t in Game.TILE_TYPES for j in range(0, Game.N_TILES_PER_RANK[t.rank]) ]
         shuffle(self.deck)
         # if dterminized, the draw sequence is fixed
         self.determinized = False
@@ -60,7 +61,7 @@ class Game(object):
 
         # game score
         self.score = 0
-        self.MAX_SCORE = Game.N_COLORS * Game.N_VALUES
+        self.MAX_SCORE = Game.N_COLORS * Game.N_RANKS
 
         # number of players
         self.curPlayer  = 0
@@ -70,7 +71,7 @@ class Game(object):
         self.HAND_SIZE   = Game.HAND_SIZE_PER_N_PLAYERS[self.NUM_PLAYERS]
         self.hands = [ [self._drawTile() for i in range(0, self.HAND_SIZE)] for p in range(0, self.NUM_PLAYERS) ]
 
-        # players hint, true if an attribute (value or color) is possible for a tile
+        # players hint, true if an attribute (rank or color) is possible for a tile
         # the attribute in order are [C0, C1, C2, C3, C4, V1, V2, V3, V4, V5]
         self.hints = [[Game.HINT_ALL] * self.HAND_SIZE for p in range(0, self.NUM_PLAYERS)]
 
@@ -116,7 +117,7 @@ class Game(object):
             if delta.playCorrect:
                 self.fireworkPile[delta.playedTile.color] -= 1
                 self.score -= 1
-                if (delta.playedTile.value == self.N_VALUES - 1):
+                if (delta.playedTile.rank == self.N_RANKS - 1):
                     # undo a firework completion
                     self.nHintTokens -= 1
             else:
@@ -152,11 +153,11 @@ class Game(object):
         self.hands[self.curPlayer][action.targetTile] = self._drawTile()    
         self.hints[self.curPlayer][action.targetTile] = Game.HINT_ALL
 
-        if tile.value == self.fireworkPile[tile.color]:
+        if tile.rank == self.fireworkPile[tile.color]:
             # correct tile placement: add to firework pile
             self.fireworkPile[tile.color] += 1
             self.score += 1
-            if self.fireworkPile[tile.color] == Game.N_VALUES:
+            if self.fireworkPile[tile.color] == Game.N_RANKS:
                 # if completing full pile of a color, add a hint token
                 self.nHintTokens += 1
             
@@ -206,15 +207,15 @@ class Game(object):
         if (action.hintIsColor):
             for i in range(0, self.HAND_SIZE):
                 if self.hands[player][i].color == attribute:
-                    self.hints[player][i] &= Game.HINT_ALL_VALUES | Game.HINT_COLORS[attribute]
+                    self.hints[player][i] &= Game.HINT_ALL_RANKS | Game.HINT_COLORS[attribute]
                 else:
                     self.hints[player][i] &= ~Game.HINT_COLORS[attribute]
         else:
             for i in range(0, self.HAND_SIZE):
-                if self.hands[player][i].value == attribute:
-                    self.hints[player][i] &= Game.HINT_ALL_COLORS | Game.HINT_VALUES[attribute]
+                if self.hands[player][i].rank == attribute:
+                    self.hints[player][i] &= Game.HINT_ALL_COLORS | Game.HINT_RANKS[attribute]
                 else:
-                    self.hints[player][i] &= ~Game.HINT_VALUES[attribute]
+                    self.hints[player][i] &= ~Game.HINT_RANKS[attribute]
 
 
     def _drawTile(self):
@@ -237,4 +238,4 @@ class Game(object):
             self.deck[r], self.deck[self.deckSize] = self.deck[self.deckSize], self.deck[r]
         
         # return the drawn tile
-        return self.deck[self.deckSize]
+        return self.deck[self.deckSize]  
