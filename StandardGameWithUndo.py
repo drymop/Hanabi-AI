@@ -6,12 +6,12 @@ from random import randint, shuffle
 import numpy as np
 
 Tile = namedtuple('Tile', 'rank color id')
+GameDelta = type('GameDelta', (object,), {})
 
 class ActionType(Enum):
     PLAY = 0
     HINT = 1
     DISCARD = 2
-    NONE = 3
 
 class Action(object):
     def __init__(self, actionType):
@@ -28,9 +28,6 @@ class Game(object):
     N_RANKS  = len(RANKS)
     N_COLORS = len(COLORS)
     MAX_SCORE = N_COLORS * N_RANKS
-    MAX_HINTS = 8
-    MAX_FUSES = 3
-
     # list of all unique tile types (= RANKS x COLORS)
     # to translate between tile type and tile index, the formulat is
     # tileId = rank * 5 + color
@@ -41,7 +38,14 @@ class Game(object):
     N_TILES_PER_RANK = (3, 2, 2, 2, 1)
     # e.g if there are 4 players, hand size = HAND_SIZE_PER_N_PLAYERS[4] = 4
     HAND_SIZE_PER_N_PLAYERS = (None, None, 5, 5, 4, 4)
-    ACTIONS_PER_N_PLAYERS = (None, None, -1, 31, -1, -1)
+
+    # Hint mask
+    HINT_ALL_RANKS  = ((1 << N_RANKS) - 1) << N_COLORS
+    HINT_ALL_COLORS = (1 << N_COLORS) - 1
+    HINT_ALL        = HINT_ALL_RANKS | HINT_ALL_COLORS
+    HINT_COLORS     = tuple(1 << i for i in range(0, N_COLORS))
+    HINT_RANKS      = tuple(1 << i for i in range(N_COLORS, N_COLORS + N_RANKS))
+
 
     def __init__(self, nPlayers):
         # keep count of each tile type
@@ -51,7 +55,7 @@ class Game(object):
         # each tile is represented by a number, which is the index of the type in Game.TILE_TYPES list
         # as tiles are drawn, deck get shuffled and partitioned into undrawn pile (index 0 to deckSize-1)
         # and drawn pile (index deckSize or greater)
-        self.deck = [t for t in Game.TILE_TYPES for j in range(Game.N_TILES_PER_RANK[t.rank]) ]
+        self.deck = [t for t in Game.TILE_TYPES for j in range(0, Game.N_TILES_PER_RANK[t.rank]) ]
         shuffle(self.deck)
         # if dterminized, the draw sequence is fixed
 #        self.determinized = False
@@ -62,8 +66,8 @@ class Game(object):
         self.fireworks = [0] * Game.N_COLORS
 
         # game tokens
-        self.nHintTokens = Game.MAX_HINTS
-        self.nFuseTokens = Game.MAX_FUSES
+        self.nHintTokens = 8
+        self.nFuseTokens = 3
 
         # game score
         self.score = 0
@@ -71,40 +75,19 @@ class Game(object):
 
         # number of players
         self.curPlayer  = 0
-        self.nPlayers = nPlayers
+        self.N_PLAYERS = nPlayers
 
         # players hand
-        self.handSize   = Game.HAND_SIZE_PER_N_PLAYERS[self.nPlayers]
-        self.hands = [ [self._drawTile() for i in range(self.handSize)] for p in range(self.nPlayers) ]
+        self.HAND_SIZE   = Game.HAND_SIZE_PER_N_PLAYERS[self.N_PLAYERS]
+        self.hands = [ [self._drawTile() for i in range(0, self.HAND_SIZE)] for p in range(0, self.N_PLAYERS) ]
 
         # players hint, true if an attribute (rank or color) is possible for a tile
         # the attribute in order are [C0, C1, C2, C3, C4, V1, V2, V3, V4, V5]
-        self.hints = [[[[True] * Game.N_RANKS, [True] * Game.N_COLORS] for t in range(self.handSize)] for p in range(self.nPlayers)]
+        self.hints = [[Game.HINT_ALL] * self.HAND_SIZE for p in range(0, self.N_PLAYERS)]
 
-        # actions players can take
-        self.actions = []
-        for i in range(self.handSize):
-            ac = Action(ActionType.PLAY)
-            ac.targetTile = i
-            self.actions.append(ac)
-        for i in range(self.handSize):
-            ac = Action(ActionType.DISCARD)
-            ac.targetTile = i
-            self.actions.append(ac)
-        for p in range(1, self.nPlayers):
-            for r in Game.RANKS:
-                ac = Action(ActionType.HINT)
-                ac.targetPlayer = p
-                ac.hintAttribute = r
-                ac.hintIsColor = False
-                self.actions.append(ac)
-            for c in Game.COLORS:
-                ac = Action(ActionType.HINT)
-                ac.targetPlayer = p
-                ac.hintAttribute = c
-                ac.hintIsColor = True
-                self.actions.append(ac)
-        self.actions.append(Action(ActionType.NONE)) # do nothing
+        # game history
+        self.history = []
+
 
     def isOver(self):
         """
@@ -112,33 +95,6 @@ class Game(object):
         """
         return self.nFuseTokens <= 0 or self.deckSize <= 0 or self.score == 25
 
-    def getValidActions(self):
-        """
-        Returns a vector of 1 and 0, where 1 indicates that the corresponding 
-        action is valid, 0 otherwise.
-        """
-        valid = [1] * (2 * self.handSize) # play and discard always valid
-        # hint
-        if self.nHintTokens == 0:
-            # cannot hint if out of hint tokens
-            valid += [0] * ((self.nPlayers-1) * (Game.N_RANKS + Game.N_COLORS))
-            valid.append(0)
-            return valid
-
-        # for each player distance p away, check for valid hints
-        for p in range(1, self.nPlayers):
-            hand = self.hands[ (self.curPlayer+p)%self.nPlayers ]    
-            hasRank = [0] * Game.N_RANKS
-            hasColor = [0] * Game.N_COLORS
-            
-            for tile in hand:
-                hasRank[tile.rank] = 1
-                hasColor[tile.color] = 1
-
-            valid += hasRank
-            valid += hasColor
-        valid.append(0)
-        return valid
 
     def play(self, action):
         if action.type == ActionType.PLAY:
@@ -151,16 +107,23 @@ class Game(object):
             raise ValueError("Expected action type to be 'PLAY', 'DISCARD' or 'HINT'; got '%r'".format(action.type))
         
         # move to next player
-        self.curPlayer = (self.curPlayer + 1) % self.nPlayers
+        self.curPlayer = (self.curPlayer + 1) % self.N_PLAYERS
 
 
     def _processPlay(self, action):
+        # changes made in this turn
+        delta = GameDelta()
+        delta.actionType = action.type
+        delta.playedPos  = action.targetTile
+        delta.oldHint    = self.hints[self.curPlayer][action.targetTile]
+
         tile = self.hands[self.curPlayer][action.targetTile]
+        delta.playedTile = tile
         # remove the played tile from play
         self.nRemainTiles[tile.id] -= 1
         # draw new tile, init hint for the new tile
         self.hands[self.curPlayer][action.targetTile] = self._drawTile()    
-        self.hints[self.curPlayer][action.targetTile] = [[True]*Game.N_RANKS, [True]*Game.N_COLORS]
+        self.hints[self.curPlayer][action.targetTile] = Game.HINT_ALL
 
         if tile.rank == self.fireworks[tile.color]:
             # correct tile placement: add to firework pile
@@ -168,47 +131,105 @@ class Game(object):
             self.score += 1
             if self.fireworks[tile.color] == Game.N_RANKS:
                 # if completing full pile of a color, add a hint token
-                self.nHintTokens = min(Game.MAX_HINTS, self.nHintTokens+1)
+                self.nHintTokens += 1
+            
+            delta.playCorrect = True
         else:
             # incorrect tile placement: remove a fuse
             self.nFuseTokens -= 1
+            delta.playCorrect = False
+
+        self.history.append(delta)
+
 
     def _processDiscard(self, action):
+        # changes made in this turn
+        delta = GameDelta()
+        delta.actionType = action.type
+
+
         tile = self.hands[self.curPlayer][action.targetTile]
+        # save info about the tile discarded and its hint
+        delta.discardPos = action.targetTile
+        delta.discardedTile = tile
+        delta.oldHint = self.hints[self.curPlayer][action.targetTile]
+
         # dicard the tile
         self.nRemainTiles[tile.id] -= 1
         # draw new tile and init its hint
         self.hands[self.curPlayer][action.targetTile] = self._drawTile()
-        self.hints[self.curPlayer][action.targetTile] = [[True]*Game.N_RANKS, [True]*Game.N_COLORS]
+        self.hints[self.curPlayer][action.targetTile] = Game.HINT_ALL
         # gain a new hint
-        self.nHintTokens = min(Game.MAX_HINTS, self.nHintTokens+1)
+        self.nHintTokens += 1
 
 
     def _processHint(self, action):
+        # changes made in this turn
+        delta = GameDelta()
+        delta.actionType = action.type
+
         # remove a hint token
         self.nHintTokens -= 1
         # get target player and attribute
-        player = (self.curPlayer + action.targetPlayer) % self.nPlayers
+        player = (self.curPlayer + action.targetPlayer) % self.N_PLAYERS
         attribute = action.hintAttribute
+        delta.hintedPlayer = player
+        delta.oldHints = deepcopy(self.hints[player])
 
         if (action.hintIsColor):
-            for i in range(self.handSize):
-                match = self.hands[player][i].color == attribute
-                tileHint = self.hints[player][i][1]
-                for j in range(Game.N_COLORS):
-                    if j == attribute:
-                        tileHint[j] = match
-                    else:
-                        tileHint[j] = tileHint[j] and not match
+            for i in range(0, self.HAND_SIZE):
+                if self.hands[player][i].color == attribute:
+                    self.hints[player][i] &= Game.HINT_ALL_RANKS | Game.HINT_COLORS[attribute]
+                else:
+                    self.hints[player][i] &= ~Game.HINT_COLORS[attribute]
         else:
-            for i in range(self.handSize):
-                match = self.hands[player][i].rank == attribute
-                tileHint = self.hints[player][i][0]
-                for j in range(Game.N_RANKS):
-                    if j == attribute:
-                        tileHint[j] = match
-                    else:
-                        tileHint[j] = tileHint[j] and not match
+            for i in range(0, self.HAND_SIZE):
+                if self.hands[player][i].rank == attribute:
+                    self.hints[player][i] &= Game.HINT_ALL_COLORS | Game.HINT_RANKS[attribute]
+                else:
+                    self.hints[player][i] &= ~Game.HINT_RANKS[attribute]
+
+    
+
+    def undo(self):
+        if len(self.history) == 0:
+            return
+        delta = self.history.pop()
+        # restore player
+        self.curPlayer = (self.curPlayer - 1) % self.N_PLAYERS
+
+        if delta.actionType == ActionType.PLAY:
+            # return the played tile with hint to hand 
+            # and add it to number of tiles in play
+            self.hands[self.curPlayer][delta.playedPos] = delta.playedTile
+            self.hints[self.curPlayer][delta.playedPos] = delta.oldHint
+            self.nRemainTiles[delta.playedTile.id] += 1
+            # return the drawn tile to the deck
+            self.deckSize += 1
+
+            if delta.playCorrect:
+                self.fireworks[delta.playedTile.color] -= 1
+                self.score -= 1
+                if (delta.playedTile.rank == self.N_RANKS - 1):
+                    # undo a firework completion
+                    self.nHintTokens -= 1
+            else:
+                self.nFuseTokens += 1
+        elif delta.actionType == ActionType.DISCARD:
+            # return the discarded tile with hint to hand 
+            # and add it to number of tiles in play
+            self.hands[self.curPlayer][delta.discardPos] = delta.discardedTile
+            self.hints[self.curPlayer][delta.discardPos] = delta.oldHint
+            self.nRemainTiles[delta.discardedTile.id] += 1
+            # return the drawn tile to the deck
+            self.deckSize += 1
+            # remove the gained hint from discard
+            self.nHintTokens -= 1
+        else: # give hint
+            # return the hint token
+            self.nHintTokens += 1
+            self.hints[delta.hintedPlayer] = delta.oldHints
+
 
     def _drawTile(self):
         """
@@ -225,9 +246,9 @@ class Game(object):
         # in both cases, return the tile at the end of the deck
         #if not self.determinized:
         # choose a random tile in deck
-        #r = randint(0, self.deckSize)
+        r = randint(0, self.deckSize)
         # move the drawn tile to the drawn part
-        #self.deck[r], self.deck[self.deckSize] = self.deck[self.deckSize], self.deck[r]
+        self.deck[r], self.deck[self.deckSize] = self.deck[self.deckSize], self.deck[r]
         
         # return the drawn tile
         return self.deck[self.deckSize]  
