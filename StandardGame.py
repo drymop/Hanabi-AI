@@ -29,7 +29,7 @@ class Game(object):
     N_COLORS = len(COLORS)
     MAX_SCORE = N_COLORS * N_RANKS
     MAX_HINTS = 8
-    MAX_FUSES = 3
+    MAX_FUSES = 50
 
     # list of all unique tile types (= RANKS x COLORS)
     # to translate between tile type and tile index, the formulat is

@@ -35,14 +35,14 @@ class Trainer:
         self.bufferSize = 45000
         self.experienceBuffer = ExperienceBuffer(self.bufferSize)
 
+        # scoring
+        self.fireworkScores = [0, 1, 2.2, 3.6, 5.3, 7.3]
+
         # precompute onehot vectors
         self.onehotPlayers = np.identity(nPlayers)
         self.onehotTiles = np.identity(Game.N_TYPES)
 
         # zero rnn state for a game
-        game_zero_state_tensor = self.trainModel.rnn_cell.zero_state(nPlayers, tf.float32)
-        batch_zero_state_tensor = self.trainModel.rnn_cell.zero_state(batchSize, tf.float32)
-
         self.gameZeroState = np.zeros((2, nPlayers, nHiddens))
         self.batchZeroState = np.zeros((2, batchSize, nHiddens))
 
@@ -73,7 +73,7 @@ class Trainer:
         hint_tokens = [g.nHintTokens] * g.nPlayers
         fuse_tokens = [g.nFuseTokens] * g.nPlayers
         fireworks = [g.fireworks] * g.nPlayers
-        action_and_rewards = [[-1, None] for _ in range(g.nPlayers)]
+        action_and_rewards = [[-1, 0] for _ in range(g.nPlayers)]
         
         if g.isOver():
             valid_masks = [self.maskZeros] * g.nPlayers
@@ -102,7 +102,7 @@ class Trainer:
         timeSeries = [[] for _ in range(game.nPlayers)]
 
         rnnStateTuple = self.gameZeroState
-        score = Trainer.getScore(game)
+        score = self.getScore(game)
         while not game.isOver():
 
             gStates = self.createGameStates(game)
@@ -112,8 +112,6 @@ class Trainer:
             x = Trainer.formatBatch([s] for s in gStates)
 
             batchQValues, rnnStateTuple = self.trainModel.predict(x, rnnStateTuple)
-            pp(rnnStateTuple)
-            input()
 
             # get the q-prediction of the current player at the only time step
             qValues = batchQValues[game.curPlayer][-1]
@@ -146,7 +144,7 @@ class Trainer:
             game.play(action)
 
             # get reward
-            newScore = Trainer.getScore(game)
+            newScore = self.getScore(game)
             for state in gStates:
                 state.action_and_reward[1] = newScore - score
             score = newScore
@@ -172,7 +170,7 @@ class Trainer:
         timeSeries = [[] for _ in range(game.nPlayers)]
 
         #rnnStateTuple = self.gameZeroState
-        score = Trainer.getScore(game)
+        score = self.getScore(game)
         while not game.isOver():
             gStates = self.createGameStates(game)
             for player in range(game.nPlayers):
@@ -200,7 +198,7 @@ class Trainer:
             game.play(action)
 
             # get reward
-            newScore = Trainer.getScore(game)
+            newScore = self.getScore(game)
             reward = newScore - score
             score = newScore
             for state in gStates:
@@ -256,8 +254,7 @@ class Trainer:
         return avgLoss / epoch
 
     def start(self, startIteration=0, startExploreRate=1, endExploreRate=0.05, exploreDecrease=0.015):
-        exploration_rate = 1
-        # fill up the buffer
+        # # fill up the buffer
         # print('==================================== FILLING BUFFER ===================================')
         # avgScore = 0
         # avgTurn = 0
@@ -280,6 +277,7 @@ class Trainer:
         # print('score: {}'.format(avgScore / nGames))
         # print('turn : {}'.format(avgTurn / nGames))
 
+        exploration_rate = startExploreRate
 
         # start training
         for it in range(startIteration, 100000+startIteration):
@@ -287,15 +285,21 @@ class Trainer:
             avgScore = 0
             avgTurn = 0
             nGames = 1000
-            for i in range(nGames):
+            i = 0
+            discarded_games = 0
+            while i < nGames:
                 game = Game(self.nPlayers)
                 score, nTurn, timeSeries = self.play(game, self.timeSteps, exploration_rate=exploration_rate)
+                if game.score <= 0:
+                    discarded_games += 1
+                    continue
                 for s in timeSeries:
                     self.experienceBuffer.add(Experience(score, s), True)
                 avgScore += score
                 avgTurn += nTurn
                 if (i % 100) == 0:
-                    print('{} games played'.format(i))
+                    print('{} games played, discarded {}'.format(i, discarded_games))
+                i += 1
             print('buffer score: {}'.format(self.experienceBuffer.avgScore))
             print('score: {}'.format(avgScore / nGames))
             print('turn : {}'.format(avgTurn / nGames))
@@ -306,10 +310,8 @@ class Trainer:
             exploration_rate = max(exploration_rate - exploreDecrease, endExploreRate)
 
 
-
-    @staticmethod
-    def getScore(game):
-        return game.score + 0.5 * game.nFuseTokens
+    def getScore(self, game):
+        return sum(self.fireworkScores[x] for x in game.fireworks) + 0.3 * (game.nFuseTokens - Game.MAX_FUSES)
 
     @staticmethod
     def checkpointFile(iteration):
@@ -329,23 +331,21 @@ class Trainer:
 
 
 
-nHiddens = 128
+nHiddens = 64
 batchSize = 128
 timeSteps = 32
 nPlayers = 3
 
 trainer = Trainer(3, nHiddens, batchSize, timeSteps)
 
-#trainer.trainModel.load_checkpoint(folder='dqn_save_2', filename=Trainer.checkpointFile(151))
-# while True:
-#     game = Game(nPlayers)
-#     trainer.play(game, timeSteps, exploration_rate=0.1, show=True)
-#     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-#     input()
 
-pp(trainer.gameZeroState)
-pp(trainer.batchZeroState)
+loadIter = 646
+trainer.trainModel.load_checkpoint(folder='save', filename=Trainer.checkpointFile(loadIter))
 
-input()
-trainer.start(startIteration=0, startExploreRate=0.8, endExploreRate=0.05, exploreDecrease=0.02)
+while True:
+    game = Game(nPlayers)
+    trainer.play(game, timeSteps, exploration_rate=0, show=True)
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    input()
 
+trainer.start(startIteration=loadIter+1, startExploreRate=0.5, endExploreRate=0.1, exploreDecrease=0.01)

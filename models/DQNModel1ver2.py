@@ -117,7 +117,7 @@ class Model(object):
 
             update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
             with tf.control_dependencies(update_ops):
-                self.train_step = tf.train.AdamOptimizer(1e-4).minimize(self.loss)
+                self.train_step = tf.train.AdamOptimizer(5e-4).minimize(self.loss)
 
         #---------------------------------
         # Initialize graph
