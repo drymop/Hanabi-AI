@@ -19,9 +19,10 @@ class Model(object):
 
     """
     
-    def __init__(self, n_hiddens, n_outputs, n_players=3, hand_size=5, n_ranks=5, n_colors=5):
+    def __init__(self, n_hiddens, n_rnn_layers, n_outputs, n_players=3, hand_size=5, n_ranks=5, n_colors=5):
         self.graph = tf.Graph()
         self.n_hiddens = n_hiddens
+        self.n_rnn_layers = n_rnn_layers
         self.n_outputs = n_outputs
 
         n_tile_types = n_ranks * n_colors
@@ -31,7 +32,7 @@ class Model(object):
             # Input place holders
 
             with tf.variable_scope('inputs'):
-                self.initial_state = tf.placeholder(tf.float32, shape=[2, None, n_hiddens], name='rnn_initial_state') # (2, batch_size, hidden_size)
+                self.initial_state = tf.placeholder(tf.float32, shape=[n_rnn_layers, 2, None, n_hiddens], name='rnn_initial_state') # (n_layers, 2, batch_size, hidden_size)
                 self.valid_mask = tf.placeholder(tf.float32, shape=[None, None, n_outputs], name='valid_mask')
                 self.loss_mask = tf.placeholder(tf.float32, shape=[None,None, n_outputs], name='loss_mask')
                 self.targets = tf.placeholder(tf.float32, shape=[None, None, n_outputs], name = 'targets')
@@ -88,22 +89,23 @@ class Model(object):
             hands = tf.reshape(hands, [-1, time_steps, hands.shape[2] * hands.shape[3] * hands.shape[4]])
 
             # Processed input concat into a 2D array (batch_size x num_features)
-            all_inputs = tf.concat([self.in_players, remain_tiles, hands, fireworks, hint_tokens, fuse_tokens], axis=-1)
+            concated_inputs = tf.concat([self.in_players, remain_tiles, hands, fireworks, hint_tokens, fuse_tokens], axis=-1)
 
             # compress the sparse input through a dense layer
-            rnn_inputs = tf.layers.dense(all_inputs, n_hiddens * 2, activation=tf.nn.sigmoid)
+            rnn_inputs = tf.layers.dense(concated_inputs, n_hiddens * 2, activation=tf.nn.sigmoid)
             rnn_inputs = tf.layers.dense(rnn_inputs, n_hiddens, activation=tf.nn.sigmoid)
 
             #--------------------------
             # Recurrent layer
 
             rnn_single_cell = tf.nn.rnn_cell.LSTMCell(n_hiddens, forget_bias=1.0, activation=tf.nn.sigmoid, state_is_tuple=True)
-            self.rnn_cell = tf.nn.rnn_cell.MultiRNNCell([rnn_single_cell] * 3, state_is_tuple=True)
+            self.rnn_cell = tf.nn.rnn_cell.MultiRNNCell([rnn_single_cell] * n_rnn_layers, state_is_tuple=True)
 
-            unstacked_state = tf.unstack(self.initial_state)
-            initial_state_tuple = tf.nn.rnn_cell.LSTMStateTuple(unstacked_state[0], unstacked_state[1])
+            unstacked_states = tf.unstack(self.initial_state) # for each layer
+            initial_state_tuple = tuple(tf.nn.rnn_cell.LSTMStateTuple(*tf.unstack(state)) for state in unstacked_states)
+            print(initial_state_tuple)
 
-            rnn_outputs, self.rnn_state = tf.nn.dynamic_rnn(self.rnn_cell, all_inputs, initial_state=initial_state_tuple)
+            rnn_outputs, self.rnn_state = tf.nn.dynamic_rnn(self.rnn_cell, rnn_inputs, initial_state=initial_state_tuple)
             dense = tf.layers.dense(rnn_outputs, n_outputs * 2, activation=tf.nn.sigmoid)
             dense = tf.layers.dense(dense, n_outputs, activation=tf.nn.sigmoid)
             self.outputs = tf.multiply(dense, self.valid_mask)
@@ -196,3 +198,4 @@ class Model(object):
             
 
 
+m = Model(123, 3, 45)
