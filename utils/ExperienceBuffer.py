@@ -29,8 +29,11 @@ class ExperienceBuffer:
         weighted: add multiple copies if experience's score is higher than average score in buffer
         '''
         if weighted:
-            nInsert = (experience.score / self.avgScore) ** 3 if self.avgScore != 0 else 0
-            nInsert = max(1, math.ceil(nInsert))
+            nInsert = max(experience.score-self.avgScore, 1) ** 2
+            # clamp between 1 and 100
+            nInsert = math.ceil(nInsert)
+            nInsert = max(1, nInsert)
+            nInsert = min(100, nInsert)
         else:
             nInsert = 1
 

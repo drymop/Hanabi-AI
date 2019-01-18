@@ -20,14 +20,9 @@ class Model(object):
 
         with self.graph.as_default():
             #-------------------------
-            # Input place holders
+            # Input placeholders
 
             with tf.variable_scope('inputs'):
-                self.initial_state = tf.placeholder(tf.float32, shape=[n_rnn_layers, 2, None, n_hiddens], name='rnn_initial_state') # (n_layers, 2, batch_size, hidden_size)
-                self.valid_mask = tf.placeholder(tf.float32, shape=[None, None, n_outputs], name='valid_mask') # valid actions
-                self.loss_mask = tf.placeholder(tf.float32, shape=[None,None, n_outputs], name='loss_mask') # outputs to be accounted for in loss calculation
-                self.targets = tf.placeholder(tf.float32, shape=[None, None, n_outputs], name = 'targets')
-
                 # in_cur_player: current player (relative to this player)
                 # Dimensions: (batch_size x time_steps)
                 self.in_cur_player = tf.placeholder(tf.int32, shape=[None, None], name='cur_player')
@@ -49,10 +44,16 @@ class Model(object):
                 self.in_hint_tokens = tf.placeholder(tf.float32, shape=[None, None], name='hint_tokens')
                 self.in_fuse_tokens = tf.placeholder(tf.float32, shape=[None, None], name='fuse_tokens')
 
-                # stack height of each suit
-                # Dimensions: (batch_size x n_suits)
+                # firework height of each suit
+                # Dimensions: (batch_size, time_step, n_suits)
                 self.in_fireworks = tf.placeholder(tf.int32, shape=[None, None, n_suits], name='input_fireworks')
+                
+                self.in_last_actions = tf.placeholder(tf.int32, shape=[None, None], name='last_action')
 
+                self.initial_state = tf.placeholder(tf.float32, shape=[n_rnn_layers, 2, None, n_hiddens], name='rnn_initial_state') # (n_layers, 2, batch_size, hidden_size)
+                self.valid_mask = tf.placeholder(tf.float32, shape=[None, None, n_outputs], name='valid_mask') # valid actions
+                self.loss_mask = tf.placeholder(tf.float32, shape=[None,None, n_outputs], name='loss_mask') # outputs to be accounted for in loss calculation
+                self.targets = tf.placeholder(tf.float32, shape=[None, None, n_outputs], name='targets')
 
             #-------------------------
             # Preprocess input heads into 1 large input array:
@@ -72,7 +73,6 @@ class Model(object):
             # subtract the seen tiles from other players
             remain_tiles = self.in_remain_tiles - tf.reduce_sum(onehot_hands, axis=[2,3])
 
-
             # normalize integral quantities into (0, 1) range
             # remain_tiles = tf.scalar_mul(tf.constant(1/MAX_N_PER_TYPES), remain_tiles)
             # hint_tokens  = tf.scalar_mul(tf.constant(1/MAX_HINT_TOKENS), self.in_hint_tokens)
@@ -86,9 +86,11 @@ class Model(object):
             hint_tokens =  tf.reshape(hint_tokens, [-1, time_steps, 1])
             fuse_tokens =  tf.reshape(fuse_tokens, [-1, time_steps, 1])
 
+            # one hot vector for last action
+            one_hot_last_actions = tf.one_hot(self.in_last_actions, n_outputs-1)
 
             # Processed input concat into a 2D array (batch_size x num_features)
-            concated_inputs = tf.concat([onehot_cur_player, remain_tiles, hands_hints, onehot_fireworks, hint_tokens, fuse_tokens], axis=-1)
+            concated_inputs = tf.concat([onehot_cur_player, remain_tiles, hands_hints, onehot_fireworks, hint_tokens, fuse_tokens, one_hot_last_actions], axis=-1)
 
             # compress the sparse input through a dense layer
             rnn_inputs = tf.layers.dense(concated_inputs, n_hiddens * 2, activation=tf.nn.sigmoid)
@@ -143,6 +145,7 @@ class Model(object):
             self.in_hint_tokens: games.hint_tokens,
             self.in_fuse_tokens: games.fuse_tokens,
             self.in_fireworks: games.fireworks,
+            self.in_last_actions: games.last_actions,
             self.valid_mask: games.valid_mask
         }
 
@@ -166,6 +169,7 @@ class Model(object):
             self.in_hint_tokens: games.hint_tokens,
             self.in_fuse_tokens: games.fuse_tokens,
             self.in_fireworks: games.fireworks,
+            self.in_last_actions: games.last_actions,
             self.valid_mask: games.valid_mask,
             self.loss_mask: games.loss_mask,
             self.targets: targets
@@ -191,4 +195,3 @@ class Model(object):
         with self.graph.as_default():
             self.saver = tf.train.Saver()
             self.saver.restore(self.sess, filepath)
-            
