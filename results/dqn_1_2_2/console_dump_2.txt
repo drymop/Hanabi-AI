@@ -1,0 +1,2722 @@
+==================================== FILLING BUFFER ===================================
+200 games played
+buffer score: 3.4283266129032235
+score: 1.675
+turn : 59.14
+400 games played
+buffer score: 3.900922778047603
+score: 1.8447500000000006
+turn : 59.005
+600 games played
+buffer score: 4.151180599872401
+score: 1.8453333333333342
+turn : 58.888333333333335
+800 games played
+buffer score: 4.290495668912436
+score: 1.9086249999999996
+turn : 58.79375
+1000 games played
+buffer score: 4.214950884086454
+score: 1.9211999999999987
+turn : 58.717
+1200 games played
+buffer score: 4.242744323790731
+score: 1.9614999999999994
+turn : 58.7325
+1400 games played
+buffer score: 4.093118466898986
+score: 1.920714285714286
+turn : 58.692142857142855
+1600 games played
+buffer score: 4.121088004057843
+score: 1.905812500000002
+turn : 58.734375
+1800 games played
+buffer score: 4.103260746925437
+score: 1.9046666666666694
+turn : 58.71277777777778
+2000 games played
+buffer score: 4.045147375988523
+score: 1.9087000000000018
+turn : 58.7165
+2200 games played
+buffer score: 4.154331511164694
+score: 1.9299545454545466
+turn : 58.72636363636364
+2400 games played
+buffer score: 4.116787946237496
+score: 1.9316666666666678
+turn : 58.71666666666667
+2600 games played
+buffer score: 4.07621926963165
+score: 1.9268846153846177
+turn : 58.74038461538461
+2800 games played
+buffer score: 4.050792592592611
+score: 1.9325000000000032
+turn : 58.74035714285714
+3000 games played
+buffer score: 4.073213671686954
+score: 1.9586666666666686
+turn : 58.75266666666667
+3200 games played
+buffer score: 4.0334240892000635
+score: 1.9604375000000025
+turn : 58.7696875
+3400 games played
+buffer score: 4.075623672230633
+score: 1.9742058823529443
+turn : 58.768235294117645
+3600 games played
+buffer score: 4.012379020573706
+score: 1.9580555555555579
+turn : 58.76083333333333
+3800 games played
+buffer score: 4.019630522968924
+score: 1.957289473684214
+turn : 58.739736842105266
+4000 games played
+buffer score: 4.066035490713346
+score: 1.9736750000000032
+turn : 58.745
+4200 games played
+buffer score: 4.068074839980217
+score: 1.9749523809523817
+turn : 58.74738095238095
+4400 games played
+buffer score: 4.046353651062931
+score: 1.9796590909090905
+turn : 58.754318181818185
+4600 games played
+buffer score: 4.018012056383918
+score: 1.969586956521738
+turn : 58.75717391304348
+4800 games played
+buffer score: 4.0145990791415676
+score: 1.970187499999998
+turn : 58.76020833333333
+5000 games played
+buffer score: 4.030041666666576
+score: 1.9738399999999992
+turn : 58.7576
+5200 games played
+buffer score: 4.020020850876045
+score: 1.9762884615384604
+turn : 58.74980769230769
+5400 games played
+buffer score: 3.9942554097471215
+score: 1.9722777777777756
+turn : 58.74981481481481
+5600 games played
+buffer score: 3.9903396789846077
+score: 1.9706249999999983
+turn : 58.76
+5800 games played
+buffer score: 3.9640917975819217
+score: 1.9653793103448252
+turn : 58.75913793103448
+6000 games played
+buffer score: 3.9484295029095593
+score: 1.9574999999999994
+turn : 58.76
+6200 games played
+buffer score: 3.9266356093579193
+score: 1.9545967741935482
+turn : 58.77532258064516
+6400 games played
+buffer score: 3.937513541905953
+score: 1.9547343749999988
+turn : 58.77046875
+6600 games played
+buffer score: 3.9370442252624067
+score: 1.9534999999999991
+turn : 58.77469696969697
+6800 games played
+buffer score: 3.9355667242229186
+score: 1.9487499999999975
+turn : 58.78029411764706
+7000 games played
+buffer score: 3.921440139155393
+score: 1.94925714285714
+turn : 58.78471428571429
+7200 games played
+buffer score: 3.9333488331540494
+score: 1.9492499999999977
+turn : 58.78736111111111
+7400 games played
+buffer score: 3.939151049898333
+score: 1.9543108108108092
+turn : 58.78445945945946
+score: 1.9573333333333311
+turn : 58.78573333333333
+========================================= ITER 363 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 0
+600 games played, discarded 0
+700 games played, discarded 0
+800 games played, discarded 0
+900 games played, discarded 0
+buffer score: 3.9445067456721374
+score: 2.009800000000002
+turn : 58.938
+loss: 0.004501721663400531
+========================================= ITER 364 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 1
+600 games played, discarded 2
+700 games played, discarded 3
+800 games played, discarded 3
+900 games played, discarded 3
+buffer score: 3.968646666666603
+score: 1.9701000000000009
+turn : 58.758
+loss: 0.004478369189891964
+========================================= ITER 365 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 1
+600 games played, discarded 1
+700 games played, discarded 1
+800 games played, discarded 1
+900 games played, discarded 1
+buffer score: 3.95699333333327
+score: 2.1391000000000013
+turn : 58.977
+loss: 0.004399305912666023
+========================================= ITER 366 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 0
+600 games played, discarded 0
+700 games played, discarded 0
+800 games played, discarded 0
+900 games played, discarded 0
+buffer score: 3.973411111111106
+score: 1.972
+turn : 58.854
+loss: 0.004392222021706403
+========================================= ITER 367 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 1
+600 games played, discarded 1
+700 games played, discarded 1
+800 games played, discarded 1
+900 games played, discarded 1
+buffer score: 4.01649999999987
+score: 1.9579999999999982
+turn : 58.758
+loss: 0.0043821343570016325
+========================================= ITER 368 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 0
+600 games played, discarded 0
+700 games played, discarded 0
+800 games played, discarded 0
+900 games played, discarded 0
+buffer score: 4.0081333333331415
+score: 1.9964999999999982
+turn : 58.674
+loss: 0.004284498018678278
+========================================= ITER 369 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 0
+600 games played, discarded 0
+700 games played, discarded 0
+800 games played, discarded 0
+900 games played, discarded 0
+buffer score: 4.03705555555538
+score: 2.0688999999999993
+turn : 58.821
+loss: 0.004314676159992814
+========================================= ITER 370 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 1
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 1
+600 games played, discarded 1
+700 games played, discarded 1
+800 games played, discarded 1
+900 games played, discarded 1
+buffer score: 4.128939999999862
+score: 2.2589000000000006
+turn : 58.712
+loss: 0.004317520090844482
+========================================= ITER 371 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 0
+600 games played, discarded 0
+700 games played, discarded 0
+800 games played, discarded 0
+900 games played, discarded 0
+buffer score: 4.157488888888701
+score: 2.3
+turn : 58.74
+loss: 0.004325957659166307
+========================================= ITER 372 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 0
+600 games played, discarded 0
+700 games played, discarded 0
+800 games played, discarded 1
+900 games played, discarded 1
+buffer score: 4.21392222222206
+score: 2.299200000000005
+turn : 58.522
+loss: 0.00432840455789119
+========================================= ITER 373 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 2
+400 games played, discarded 2
+500 games played, discarded 2
+600 games played, discarded 2
+700 games played, discarded 2
+800 games played, discarded 3
+900 games played, discarded 3
+buffer score: 4.232799999999834
+score: 2.3138000000000014
+turn : 58.608
+loss: 0.004342533899471163
+========================================= ITER 374 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 0
+600 games played, discarded 0
+700 games played, discarded 0
+800 games played, discarded 0
+900 games played, discarded 1
+buffer score: 4.3039999999997285
+score: 2.4416999999999986
+turn : 58.545
+loss: 0.004394035872537643
+========================================= ITER 375 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 0
+600 games played, discarded 0
+700 games played, discarded 0
+800 games played, discarded 0
+900 games played, discarded 0
+buffer score: 4.338426666666387
+score: 2.4504000000000032
+turn : 58.623
+loss: 0.004339143792167306
+========================================= ITER 376 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 1
+600 games played, discarded 1
+700 games played, discarded 1
+800 games played, discarded 1
+900 games played, discarded 3
+buffer score: 4.361844444444254
+score: 2.475300000000004
+turn : 58.512
+loss: 0.004270239535253495
+========================================= ITER 377 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 1
+300 games played, discarded 2
+400 games played, discarded 2
+500 games played, discarded 2
+600 games played, discarded 2
+700 games played, discarded 2
+800 games played, discarded 2
+900 games played, discarded 2
+buffer score: 4.434926666666555
+score: 2.447099999999998
+turn : 58.49
+loss: 0.0043597583356313405
+========================================= ITER 378 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 0
+600 games played, discarded 0
+700 games played, discarded 0
+800 games played, discarded 0
+900 games played, discarded 0
+buffer score: 4.505771111110937
+score: 2.5331999999999977
+turn : 58.607
+loss: 0.004446931364946068
+========================================= ITER 379 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 2
+600 games played, discarded 2
+700 games played, discarded 2
+800 games played, discarded 2
+900 games played, discarded 2
+buffer score: 4.524584444444285
+score: 2.5441999999999974
+turn : 58.476
+loss: 0.004368873827625066
+========================================= ITER 380 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 1
+400 games played, discarded 2
+500 games played, discarded 3
+600 games played, discarded 3
+700 games played, discarded 3
+800 games played, discarded 3
+900 games played, discarded 4
+buffer score: 4.6773066666665315
+score: 2.7859000000000007
+turn : 58.555
+loss: 0.0043510078731924294
+========================================= ITER 381 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 0
+600 games played, discarded 1
+700 games played, discarded 1
+800 games played, discarded 1
+900 games played, discarded 1
+buffer score: 4.693962222222109
+score: 2.610299999999998
+turn : 58.45
+loss: 0.004361986469011754
+========================================= ITER 382 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 0
+600 games played, discarded 0
+700 games played, discarded 0
+800 games played, discarded 0
+900 games played, discarded 0
+buffer score: 4.704737777777639
+score: 2.6353999999999984
+turn : 58.753
+loss: 0.004326507933437824
+========================================= ITER 383 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 0
+600 games played, discarded 1
+700 games played, discarded 1
+800 games played, discarded 1
+900 games played, discarded 1
+buffer score: 4.679151111111063
+score: 2.7064999999999992
+turn : 58.671
+loss: 0.004301873156800866
+========================================= ITER 384 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 1
+400 games played, discarded 2
+500 games played, discarded 2
+600 games played, discarded 2
+700 games played, discarded 2
+800 games played, discarded 2
+900 games played, discarded 2
+buffer score: 4.683837777777708
+score: 2.6869
+turn : 58.644
+loss: 0.004260907303541899
+========================================= ITER 385 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 1
+500 games played, discarded 1
+600 games played, discarded 2
+700 games played, discarded 2
+800 games played, discarded 2
+900 games played, discarded 2
+buffer score: 4.694051111111049
+score: 2.5369
+turn : 58.947
+loss: 0.004208744207862765
+========================================= ITER 386 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 1
+600 games played, discarded 1
+700 games played, discarded 2
+800 games played, discarded 2
+900 games played, discarded 2
+buffer score: 4.674764444444405
+score: 2.742599999999999
+turn : 58.821
+loss: 0.004196299631148577
+========================================= ITER 387 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 0
+600 games played, discarded 0
+700 games played, discarded 0
+800 games played, discarded 0
+900 games played, discarded 1
+buffer score: 4.721020000000083
+score: 2.8555
+turn : 58.889
+loss: 0.004202029455918819
+========================================= ITER 388 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 1
+600 games played, discarded 2
+700 games played, discarded 3
+800 games played, discarded 3
+900 games played, discarded 4
+buffer score: 4.720453333333473
+score: 2.9011
+turn : 58.683
+loss: 0.004138019904494286
+========================================= ITER 389 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 1
+600 games played, discarded 1
+700 games played, discarded 1
+800 games played, discarded 1
+900 games played, discarded 1
+buffer score: 4.690793333333399
+score: 2.703999999999996
+turn : 58.997
+loss: 0.004008635417558253
+========================================= ITER 390 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 0
+600 games played, discarded 0
+700 games played, discarded 0
+800 games played, discarded 0
+900 games played, discarded 0
+buffer score: 4.6593511111112695
+score: 2.861300000000007
+turn : 58.761
+loss: 0.004018755324650556
+========================================= ITER 391 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 2
+600 games played, discarded 3
+700 games played, discarded 3
+800 games played, discarded 3
+900 games played, discarded 3
+buffer score: 4.7239622222222915
+score: 3.0357000000000003
+turn : 58.316
+loss: 0.003990924486424774
+========================================= ITER 392 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 1
+500 games played, discarded 1
+600 games played, discarded 1
+700 games played, discarded 1
+800 games played, discarded 1
+900 games played, discarded 1
+buffer score: 4.77819999999997
+score: 2.926199999999998
+turn : 58.706
+loss: 0.004004400591365993
+========================================= ITER 393 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 1
+400 games played, discarded 2
+500 games played, discarded 2
+600 games played, discarded 2
+700 games played, discarded 2
+800 games played, discarded 2
+900 games played, discarded 2
+buffer score: 4.804039999999985
+score: 2.749500000000001
+turn : 58.786
+loss: 0.0039530409686267375
+========================================= ITER 394 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 1
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 2
+600 games played, discarded 2
+700 games played, discarded 2
+800 games played, discarded 2
+900 games played, discarded 2
+buffer score: 4.898746666666671
+score: 2.890099999999995
+turn : 58.747
+loss: 0.004013526837807149
+========================================= ITER 395 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 1
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 1
+600 games played, discarded 1
+700 games played, discarded 2
+800 games played, discarded 2
+900 games played, discarded 2
+buffer score: 4.886637777777757
+score: 2.822799999999999
+turn : 58.361
+loss: 0.003919450053945184
+========================================= ITER 396 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 1
+400 games played, discarded 2
+500 games played, discarded 2
+600 games played, discarded 3
+700 games played, discarded 3
+800 games played, discarded 3
+900 games played, discarded 4
+buffer score: 4.911439999999926
+score: 2.7548999999999984
+turn : 58.567
+loss: 0.0040004249545745555
+========================================= ITER 397 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 4
+400 games played, discarded 6
+500 games played, discarded 6
+600 games played, discarded 6
+700 games played, discarded 6
+800 games played, discarded 6
+900 games played, discarded 6
+buffer score: 4.885568888888735
+score: 2.887200000000004
+turn : 58.124
+loss: 0.003913710373453796
+========================================= ITER 398 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 1
+600 games played, discarded 1
+700 games played, discarded 1
+800 games played, discarded 1
+900 games played, discarded 2
+buffer score: 4.908668888888752
+score: 3.007000000000003
+turn : 58.066
+loss: 0.003839344794396311
+========================================= ITER 399 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 2
+600 games played, discarded 3
+700 games played, discarded 3
+800 games played, discarded 4
+900 games played, discarded 4
+buffer score: 4.861986666666497
+score: 2.8851
+turn : 58.403
+loss: 0.0038358123903162776
+========================================= ITER 400 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 2
+300 games played, discarded 2
+400 games played, discarded 2
+500 games played, discarded 3
+600 games played, discarded 3
+700 games played, discarded 5
+800 games played, discarded 5
+900 games played, discarded 5
+buffer score: 4.834195555555403
+score: 3.0836000000000006
+turn : 58.015
+loss: 0.003783732911106199
+========================================= ITER 401 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 2
+400 games played, discarded 2
+500 games played, discarded 4
+600 games played, discarded 4
+700 games played, discarded 6
+800 games played, discarded 6
+900 games played, discarded 6
+buffer score: 4.85860222222205
+score: 3.052399999999999
+turn : 58.021
+loss: 0.0037277535162866114
+========================================= ITER 402 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 1
+400 games played, discarded 2
+500 games played, discarded 2
+600 games played, discarded 2
+700 games played, discarded 3
+800 games played, discarded 3
+900 games played, discarded 4
+buffer score: 4.850168888888787
+score: 2.839600000000003
+turn : 58.086
+loss: 0.0037613507336936892
+========================================= ITER 403 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 2
+400 games played, discarded 2
+500 games played, discarded 2
+600 games played, discarded 2
+700 games played, discarded 2
+800 games played, discarded 2
+900 games played, discarded 4
+buffer score: 4.784319999999867
+score: 2.799099999999999
+turn : 58.121
+loss: 0.0037391928769648073
+========================================= ITER 404 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 2
+300 games played, discarded 2
+400 games played, discarded 2
+500 games played, discarded 3
+600 games played, discarded 3
+700 games played, discarded 3
+800 games played, discarded 3
+900 games played, discarded 4
+buffer score: 4.826499999999918
+score: 3.0133999999999985
+turn : 58.401
+loss: 0.003656683755107224
+========================================= ITER 405 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 0
+500 games played, discarded 2
+600 games played, discarded 4
+700 games played, discarded 4
+800 games played, discarded 4
+900 games played, discarded 4
+buffer score: 4.825473333333311
+score: 3.0098000000000003
+turn : 58.297
+loss: 0.0036576844821684064
+========================================= ITER 406 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 1
+600 games played, discarded 1
+700 games played, discarded 1
+800 games played, discarded 1
+900 games played, discarded 1
+buffer score: 4.862795555555539
+score: 3.086599999999999
+turn : 58.471
+loss: 0.0036614834144711493
+========================================= ITER 407 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 1
+400 games played, discarded 2
+500 games played, discarded 3
+600 games played, discarded 4
+700 games played, discarded 4
+800 games played, discarded 5
+900 games played, discarded 5
+buffer score: 4.928279999999995
+score: 3.121599999999998
+turn : 58.63
+loss: 0.003726588066201657
+========================================= ITER 408 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 2
+300 games played, discarded 2
+400 games played, discarded 2
+500 games played, discarded 2
+600 games played, discarded 3
+700 games played, discarded 4
+800 games played, discarded 4
+900 games played, discarded 5
+buffer score: 4.9356711111110325
+score: 3.0557000000000025
+turn : 58.937
+loss: 0.00357430680654943
+========================================= ITER 409 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 1
+500 games played, discarded 3
+600 games played, discarded 3
+700 games played, discarded 5
+800 games played, discarded 5
+900 games played, discarded 6
+buffer score: 4.970686666666654
+score: 2.811599999999995
+turn : 59.782
+loss: 0.0036407002760097383
+========================================= ITER 410 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 1
+500 games played, discarded 1
+600 games played, discarded 1
+700 games played, discarded 1
+800 games played, discarded 1
+900 games played, discarded 1
+buffer score: 4.963806666666618
+score: 2.8139
+turn : 60.271
+loss: 0.0036171960993669925
+========================================= ITER 411 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 1
+400 games played, discarded 3
+500 games played, discarded 3
+600 games played, discarded 3
+700 games played, discarded 4
+800 games played, discarded 4
+900 games played, discarded 5
+buffer score: 4.920464444444417
+score: 2.9009999999999954
+turn : 60.201
+loss: 0.0036046212678775193
+========================================= ITER 412 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 2
+400 games played, discarded 2
+500 games played, discarded 2
+600 games played, discarded 2
+700 games played, discarded 4
+800 games played, discarded 4
+900 games played, discarded 4
+buffer score: 4.943737777777784
+score: 2.8402000000000016
+turn : 60.259
+loss: 0.003666503841523081
+========================================= ITER 413 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 2
+600 games played, discarded 2
+700 games played, discarded 4
+800 games played, discarded 5
+900 games played, discarded 6
+buffer score: 4.902022222222225
+score: 2.698800000000003
+turn : 60.779
+loss: 0.003617609536740929
+========================================= ITER 414 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 1
+300 games played, discarded 2
+400 games played, discarded 2
+500 games played, discarded 2
+600 games played, discarded 3
+700 games played, discarded 5
+800 games played, discarded 5
+900 games played, discarded 7
+buffer score: 4.945042222222161
+score: 2.886799999999997
+turn : 60.56
+loss: 0.0036676142597571017
+========================================= ITER 415 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 2
+300 games played, discarded 2
+400 games played, discarded 3
+500 games played, discarded 3
+600 games played, discarded 3
+700 games played, discarded 3
+800 games played, discarded 4
+900 games played, discarded 5
+buffer score: 4.900731111110973
+score: 2.6755
+turn : 60.777
+loss: 0.0036026622564531863
+========================================= ITER 416 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 2
+300 games played, discarded 2
+400 games played, discarded 4
+500 games played, discarded 4
+600 games played, discarded 5
+700 games played, discarded 7
+800 games played, discarded 9
+900 games played, discarded 9
+buffer score: 4.805184444444208
+score: 2.5837000000000003
+turn : 61.395
+loss: 0.0035573766054585575
+========================================= ITER 417 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 3
+300 games played, discarded 4
+400 games played, discarded 4
+500 games played, discarded 5
+600 games played, discarded 6
+700 games played, discarded 7
+800 games played, discarded 7
+900 games played, discarded 8
+buffer score: 4.785073333333013
+score: 2.745800000000002
+turn : 61.064
+loss: 0.0035255080042406917
+========================================= ITER 418 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 2
+400 games played, discarded 3
+500 games played, discarded 7
+600 games played, discarded 9
+700 games played, discarded 10
+800 games played, discarded 11
+900 games played, discarded 12
+buffer score: 4.774959999999778
+score: 2.5797999999999996
+turn : 61.0
+loss: 0.0035329307499341665
+========================================= ITER 419 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 2
+400 games played, discarded 2
+500 games played, discarded 3
+600 games played, discarded 4
+700 games played, discarded 5
+800 games played, discarded 7
+900 games played, discarded 7
+buffer score: 4.7608999999997
+score: 2.8010999999999986
+turn : 60.69
+loss: 0.003393585314042866
+========================================= ITER 420 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 2
+600 games played, discarded 2
+700 games played, discarded 2
+800 games played, discarded 3
+900 games played, discarded 4
+buffer score: 4.809871111110822
+score: 2.9015
+turn : 60.97
+loss: 0.0034808053635060785
+========================================= ITER 421 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 1
+400 games played, discarded 2
+500 games played, discarded 2
+600 games played, discarded 4
+700 games played, discarded 4
+800 games played, discarded 6
+900 games played, discarded 8
+buffer score: 4.882519999999731
+score: 3.0099999999999993
+turn : 60.348
+loss: 0.003432179267983884
+========================================= ITER 422 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 1
+400 games played, discarded 3
+500 games played, discarded 4
+600 games played, discarded 5
+700 games played, discarded 5
+800 games played, discarded 7
+900 games played, discarded 7
+buffer score: 4.928853333333074
+score: 2.916900000000002
+turn : 60.478
+loss: 0.0034370571933686734
+========================================= ITER 423 ===================================
+0 games played, discarded 0
+100 games played, discarded 4
+200 games played, discarded 6
+300 games played, discarded 8
+400 games played, discarded 9
+500 games played, discarded 11
+600 games played, discarded 13
+700 games played, discarded 14
+800 games played, discarded 15
+900 games played, discarded 15
+buffer score: 4.939102222221889
+score: 2.8504999999999985
+turn : 61.203
+loss: 0.0034496568236500025
+========================================= ITER 424 ===================================
+0 games played, discarded 0
+100 games played, discarded 3
+200 games played, discarded 8
+300 games played, discarded 10
+400 games played, discarded 12
+500 games played, discarded 12
+600 games played, discarded 12
+700 games played, discarded 12
+800 games played, discarded 12
+900 games played, discarded 13
+buffer score: 4.935626666666347
+score: 2.976000000000001
+turn : 60.96
+loss: 0.0033829389326274395
+========================================= ITER 425 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 7
+300 games played, discarded 8
+400 games played, discarded 9
+500 games played, discarded 9
+600 games played, discarded 10
+700 games played, discarded 11
+800 games played, discarded 13
+900 games played, discarded 17
+buffer score: 5.004911111110904
+score: 3.0362000000000013
+turn : 60.479
+loss: 0.0034422212769277395
+========================================= ITER 426 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 2
+300 games played, discarded 3
+400 games played, discarded 7
+500 games played, discarded 7
+600 games played, discarded 7
+700 games played, discarded 7
+800 games played, discarded 8
+900 games played, discarded 10
+buffer score: 5.141171111111055
+score: 3.2787999999999946
+turn : 60.67
+loss: 0.0034759815107099712
+========================================= ITER 427 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 4
+300 games played, discarded 4
+400 games played, discarded 5
+500 games played, discarded 8
+600 games played, discarded 8
+700 games played, discarded 8
+800 games played, discarded 10
+900 games played, discarded 13
+buffer score: 5.19990444444444
+score: 3.171299999999995
+turn : 60.875
+loss: 0.0034898969950154426
+========================================= ITER 428 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 2
+300 games played, discarded 4
+400 games played, discarded 4
+500 games played, discarded 4
+600 games played, discarded 4
+700 games played, discarded 7
+800 games played, discarded 9
+900 games played, discarded 11
+buffer score: 5.163802222222195
+score: 3.0511999999999984
+turn : 61.169
+loss: 0.0034395531145855786
+========================================= ITER 429 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 3
+300 games played, discarded 6
+400 games played, discarded 6
+500 games played, discarded 7
+600 games played, discarded 8
+700 games played, discarded 9
+800 games played, discarded 9
+900 games played, discarded 12
+buffer score: 5.174866666666671
+score: 3.159599999999999
+turn : 61.513
+loss: 0.003386332457885146
+========================================= ITER 430 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 1
+300 games played, discarded 5
+400 games played, discarded 8
+500 games played, discarded 8
+600 games played, discarded 8
+700 games played, discarded 10
+800 games played, discarded 11
+900 games played, discarded 15
+buffer score: 5.193377777777685
+score: 3.056200000000003
+turn : 61.676
+loss: 0.003433659463189542
+========================================= ITER 431 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 2
+400 games played, discarded 4
+500 games played, discarded 7
+600 games played, discarded 11
+700 games played, discarded 12
+800 games played, discarded 12
+900 games played, discarded 14
+buffer score: 5.212544444444425
+score: 3.393199999999997
+turn : 61.65
+loss: 0.003458171428646892
+========================================= ITER 432 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 7
+300 games played, discarded 8
+400 games played, discarded 11
+500 games played, discarded 13
+600 games played, discarded 14
+700 games played, discarded 16
+800 games played, discarded 18
+900 games played, discarded 20
+buffer score: 5.2390022222222346
+score: 3.1159000000000003
+turn : 62.242
+loss: 0.0034276902838610112
+========================================= ITER 433 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 5
+300 games played, discarded 5
+400 games played, discarded 8
+500 games played, discarded 9
+600 games played, discarded 10
+700 games played, discarded 10
+800 games played, discarded 11
+900 games played, discarded 13
+buffer score: 5.209711111111191
+score: 3.1988
+turn : 62.088
+loss: 0.003441493264399469
+========================================= ITER 434 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 4
+300 games played, discarded 8
+400 games played, discarded 9
+500 games played, discarded 11
+600 games played, discarded 17
+700 games played, discarded 20
+800 games played, discarded 22
+900 games played, discarded 27
+buffer score: 5.22250444444444
+score: 3.0471000000000017
+turn : 62.579
+loss: 0.0034301296062767507
+========================================= ITER 435 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 1
+400 games played, discarded 4
+500 games played, discarded 7
+600 games played, discarded 8
+700 games played, discarded 14
+800 games played, discarded 14
+900 games played, discarded 18
+buffer score: 5.185282222222144
+score: 3.0649999999999977
+turn : 63.119
+loss: 0.003445380688644946
+========================================= ITER 436 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 3
+300 games played, discarded 7
+400 games played, discarded 8
+500 games played, discarded 9
+600 games played, discarded 13
+700 games played, discarded 14
+800 games played, discarded 16
+900 games played, discarded 19
+buffer score: 5.256762222222123
+score: 3.256099999999996
+turn : 63.031
+loss: 0.0034119363385252655
+========================================= ITER 437 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 2
+300 games played, discarded 4
+400 games played, discarded 7
+500 games played, discarded 9
+600 games played, discarded 10
+700 games played, discarded 15
+800 games played, discarded 18
+900 games played, discarded 19
+buffer score: 5.241871111110951
+score: 3.1239999999999988
+turn : 62.947
+loss: 0.0034262142819352446
+========================================= ITER 438 ===================================
+0 games played, discarded 0
+100 games played, discarded 6
+200 games played, discarded 6
+300 games played, discarded 8
+400 games played, discarded 10
+500 games played, discarded 13
+600 games played, discarded 14
+700 games played, discarded 16
+800 games played, discarded 18
+900 games played, discarded 19
+buffer score: 5.2217333333332405
+score: 3.0513000000000017
+turn : 62.851
+loss: 0.003398048731032759
+========================================= ITER 439 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 3
+300 games played, discarded 4
+400 games played, discarded 5
+500 games played, discarded 10
+600 games played, discarded 12
+700 games played, discarded 14
+800 games played, discarded 17
+900 games played, discarded 22
+buffer score: 5.34082444444432
+score: 3.6247999999999974
+turn : 61.771
+loss: 0.0034247160563245418
+========================================= ITER 440 ===================================
+0 games played, discarded 0
+100 games played, discarded 3
+200 games played, discarded 4
+300 games played, discarded 9
+400 games played, discarded 11
+500 games played, discarded 15
+600 games played, discarded 18
+700 games played, discarded 21
+800 games played, discarded 28
+900 games played, discarded 29
+buffer score: 5.256611111111033
+score: 3.0690999999999993
+turn : 63.409
+loss: 0.003347925734706223
+========================================= ITER 441 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 4
+300 games played, discarded 7
+400 games played, discarded 14
+500 games played, discarded 15
+600 games played, discarded 19
+700 games played, discarded 23
+800 games played, discarded 27
+900 games played, discarded 29
+buffer score: 5.252546666666529
+score: 3.2492000000000023
+turn : 62.975
+loss: 0.0033057806175202133
+========================================= ITER 442 ===================================
+0 games played, discarded 0
+100 games played, discarded 5
+200 games played, discarded 8
+300 games played, discarded 8
+400 games played, discarded 12
+500 games played, discarded 15
+600 games played, discarded 18
+700 games played, discarded 22
+800 games played, discarded 29
+900 games played, discarded 38
+buffer score: 5.243297777777605
+score: 3.117100000000001
+turn : 62.931
+loss: 0.003315005796030164
+========================================= ITER 443 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 3
+300 games played, discarded 4
+400 games played, discarded 4
+500 games played, discarded 9
+600 games played, discarded 13
+700 games played, discarded 15
+800 games played, discarded 17
+900 games played, discarded 17
+buffer score: 5.366155555555405
+score: 3.499600000000001
+turn : 61.697
+loss: 0.0033343397360295055
+========================================= ITER 444 ===================================
+0 games played, discarded 0
+100 games played, discarded 3
+200 games played, discarded 4
+300 games played, discarded 9
+400 games played, discarded 11
+500 games played, discarded 16
+600 games played, discarded 18
+700 games played, discarded 24
+800 games played, discarded 28
+900 games played, discarded 32
+buffer score: 5.389008888888798
+score: 3.300399999999999
+turn : 62.584
+loss: 0.0033017427031882107
+========================================= ITER 445 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 5
+300 games played, discarded 7
+400 games played, discarded 7
+500 games played, discarded 10
+600 games played, discarded 17
+700 games played, discarded 18
+800 games played, discarded 19
+900 games played, discarded 27
+buffer score: 5.35502444444429
+score: 3.196700000000003
+turn : 62.719
+loss: 0.003323536338284612
+========================================= ITER 446 ===================================
+0 games played, discarded 0
+100 games played, discarded 3
+200 games played, discarded 11
+300 games played, discarded 16
+400 games played, discarded 22
+500 games played, discarded 27
+600 games played, discarded 30
+700 games played, discarded 33
+800 games played, discarded 39
+900 games played, discarded 46
+buffer score: 5.27955111111095
+score: 3.0166999999999966
+turn : 63.24
+loss: 0.0032243755133822562
+========================================= ITER 447 ===================================
+0 games played, discarded 0
+100 games played, discarded 4
+200 games played, discarded 6
+300 games played, discarded 11
+400 games played, discarded 13
+500 games played, discarded 18
+600 games played, discarded 24
+700 games played, discarded 29
+800 games played, discarded 39
+900 games played, discarded 43
+buffer score: 5.174606666666487
+score: 2.824900000000003
+turn : 62.832
+loss: 0.003146218836773187
+========================================= ITER 448 ===================================
+0 games played, discarded 0
+100 games played, discarded 5
+200 games played, discarded 10
+300 games played, discarded 15
+400 games played, discarded 22
+500 games played, discarded 29
+600 games played, discarded 36
+700 games played, discarded 40
+800 games played, discarded 41
+900 games played, discarded 50
+buffer score: 5.170226666666424
+score: 2.689499999999999
+turn : 63.399
+loss: 0.0031517475796863435
+========================================= ITER 449 ===================================
+0 games played, discarded 0
+100 games played, discarded 6
+200 games played, discarded 11
+300 games played, discarded 14
+400 games played, discarded 23
+500 games played, discarded 26
+600 games played, discarded 30
+700 games played, discarded 36
+800 games played, discarded 47
+900 games played, discarded 53
+buffer score: 5.044064444444269
+score: 2.7561000000000013
+turn : 63.36
+loss: 0.003024786713067442
+========================================= ITER 450 ===================================
+0 games played, discarded 0
+100 games played, discarded 8
+200 games played, discarded 21
+300 games played, discarded 26
+400 games played, discarded 37
+500 games played, discarded 38
+600 games played, discarded 44
+700 games played, discarded 53
+800 games played, discarded 61
+900 games played, discarded 68
+buffer score: 4.97197333333315
+score: 2.6095999999999977
+turn : 63.849
+loss: 0.003023088281042874
+========================================= ITER 451 ===================================
+0 games played, discarded 0
+100 games played, discarded 14
+200 games played, discarded 25
+300 games played, discarded 35
+400 games played, discarded 42
+500 games played, discarded 53
+600 games played, discarded 69
+700 games played, discarded 80
+800 games played, discarded 95
+900 games played, discarded 107
+buffer score: 4.798639999999777
+score: 2.4033999999999995
+turn : 64.461
+loss: 0.0028676124382764102
+========================================= ITER 452 ===================================
+0 games played, discarded 0
+100 games played, discarded 12
+200 games played, discarded 24
+300 games played, discarded 33
+400 games played, discarded 40
+500 games played, discarded 46
+600 games played, discarded 53
+700 games played, discarded 63
+800 games played, discarded 78
+900 games played, discarded 89
+buffer score: 4.623415555555345
+score: 2.1483
+turn : 64.855
+loss: 0.0027356590097770096
+========================================= ITER 453 ===================================
+0 games played, discarded 0
+100 games played, discarded 8
+200 games played, discarded 23
+300 games played, discarded 35
+400 games played, discarded 45
+500 games played, discarded 56
+600 games played, discarded 65
+700 games played, discarded 73
+800 games played, discarded 82
+900 games played, discarded 93
+buffer score: 4.498884444444199
+score: 2.1879000000000026
+turn : 64.588
+loss: 0.0026523388689383863
+========================================= ITER 454 ===================================
+0 games played, discarded 0
+100 games played, discarded 9
+200 games played, discarded 19
+300 games played, discarded 28
+400 games played, discarded 45
+500 games played, discarded 63
+600 games played, discarded 76
+700 games played, discarded 90
+800 games played, discarded 103
+900 games played, discarded 111
+buffer score: 4.277988888888635
+score: 2.0223999999999993
+turn : 64.634
+loss: 0.0025064869597554206
+========================================= ITER 455 ===================================
+0 games played, discarded 0
+100 games played, discarded 12
+200 games played, discarded 27
+300 games played, discarded 39
+400 games played, discarded 46
+500 games played, discarded 59
+600 games played, discarded 70
+700 games played, discarded 77
+800 games played, discarded 88
+900 games played, discarded 95
+buffer score: 4.150471111110843
+score: 2.103599999999997
+turn : 64.26
+loss: 0.0024310260405763983
+========================================= ITER 456 ===================================
+0 games played, discarded 0
+100 games played, discarded 11
+200 games played, discarded 25
+300 games played, discarded 36
+400 games played, discarded 50
+500 games played, discarded 58
+600 games played, discarded 73
+700 games played, discarded 80
+800 games played, discarded 89
+900 games played, discarded 101
+buffer score: 4.0322977777775195
+score: 2.0221999999999984
+turn : 64.207
+loss: 0.002411849279887974
+========================================= ITER 457 ===================================
+0 games played, discarded 0
+100 games played, discarded 6
+200 games played, discarded 16
+300 games played, discarded 27
+400 games played, discarded 40
+500 games played, discarded 50
+600 games played, discarded 56
+700 games played, discarded 68
+800 games played, discarded 79
+900 games played, discarded 87
+buffer score: 3.9534399999997545
+score: 2.2165
+turn : 64.163
+loss: 0.0023003524902742356
+========================================= ITER 458 ===================================
+0 games played, discarded 0
+100 games played, discarded 9
+200 games played, discarded 23
+300 games played, discarded 36
+400 games played, discarded 42
+500 games played, discarded 55
+600 games played, discarded 60
+700 games played, discarded 73
+800 games played, discarded 82
+900 games played, discarded 93
+buffer score: 3.881379999999862
+score: 2.1758000000000006
+turn : 63.407
+loss: 0.002250622345600277
+========================================= ITER 459 ===================================
+0 games played, discarded 0
+100 games played, discarded 7
+200 games played, discarded 21
+300 games played, discarded 34
+400 games played, discarded 44
+500 games played, discarded 51
+600 games played, discarded 55
+700 games played, discarded 61
+800 games played, discarded 68
+900 games played, discarded 76
+buffer score: 3.8241866666666464
+score: 2.288999999999999
+turn : 63.48
+loss: 0.0021707884420175106
+========================================= ITER 460 ===================================
+0 games played, discarded 0
+100 games played, discarded 8
+200 games played, discarded 13
+300 games played, discarded 24
+400 games played, discarded 31
+500 games played, discarded 40
+600 games played, discarded 50
+700 games played, discarded 57
+800 games played, discarded 64
+900 games played, discarded 75
+buffer score: 3.832595555555514
+score: 2.4866999999999977
+turn : 62.687
+loss: 0.002155345530482009
+========================================= ITER 461 ===================================
+0 games played, discarded 0
+100 games played, discarded 5
+200 games played, discarded 15
+300 games played, discarded 22
+400 games played, discarded 31
+500 games played, discarded 38
+600 games played, discarded 45
+700 games played, discarded 59
+800 games played, discarded 70
+900 games played, discarded 76
+buffer score: 3.9406111111110556
+score: 2.6014000000000017
+turn : 62.324
+loss: 0.0022089799877721816
+========================================= ITER 462 ===================================
+0 games played, discarded 0
+100 games played, discarded 7
+200 games played, discarded 11
+300 games played, discarded 19
+400 games played, discarded 26
+500 games played, discarded 28
+600 games played, discarded 35
+700 games played, discarded 39
+800 games played, discarded 46
+900 games played, discarded 51
+buffer score: 4.0245866666666235
+score: 2.5144999999999995
+turn : 62.749
+loss: 0.0021881441946607085
+========================================= ITER 463 ===================================
+0 games played, discarded 0
+100 games played, discarded 6
+200 games played, discarded 14
+300 games played, discarded 19
+400 games played, discarded 27
+500 games played, discarded 34
+600 games played, discarded 39
+700 games played, discarded 43
+800 games played, discarded 49
+900 games played, discarded 53
+buffer score: 4.192362222222243
+score: 2.764100000000002
+turn : 61.156
+loss: 0.002332596918568015
+========================================= ITER 464 ===================================
+0 games played, discarded 0
+100 games played, discarded 4
+200 games played, discarded 8
+300 games played, discarded 11
+400 games played, discarded 15
+500 games played, discarded 21
+600 games played, discarded 23
+700 games played, discarded 24
+800 games played, discarded 25
+900 games played, discarded 28
+buffer score: 4.41191777777791
+score: 3.1957999999999975
+turn : 60.862
+loss: 0.002420823520515114
+========================================= ITER 465 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 4
+300 games played, discarded 6
+400 games played, discarded 10
+500 games played, discarded 13
+600 games played, discarded 13
+700 games played, discarded 13
+800 games played, discarded 14
+900 games played, discarded 15
+buffer score: 4.699442222222391
+score: 3.4972000000000025
+turn : 60.911
+loss: 0.002569050540914759
+========================================= ITER 466 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 2
+300 games played, discarded 2
+400 games played, discarded 2
+500 games played, discarded 2
+600 games played, discarded 2
+700 games played, discarded 3
+800 games played, discarded 3
+900 games played, discarded 3
+buffer score: 4.987453333333402
+score: 3.8521000000000027
+turn : 60.319
+loss: 0.0027611882938072085
+========================================= ITER 467 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 2
+300 games played, discarded 5
+400 games played, discarded 6
+500 games played, discarded 6
+600 games played, discarded 6
+700 games played, discarded 8
+800 games played, discarded 8
+900 games played, discarded 9
+buffer score: 5.2723755555554535
+score: 3.890900000000005
+turn : 60.499
+loss: 0.0029827944096177815
+========================================= ITER 468 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 2
+300 games played, discarded 3
+400 games played, discarded 3
+500 games played, discarded 4
+600 games played, discarded 4
+700 games played, discarded 4
+800 games played, discarded 4
+900 games played, discarded 4
+buffer score: 5.445808888888802
+score: 3.858599999999999
+turn : 60.973
+loss: 0.0031724585010670125
+========================================= ITER 469 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 1
+300 games played, discarded 1
+400 games played, discarded 2
+500 games played, discarded 2
+600 games played, discarded 3
+700 games played, discarded 3
+800 games played, discarded 4
+900 games played, discarded 5
+buffer score: 5.540802222222069
+score: 3.825700000000003
+turn : 60.426
+loss: 0.0032363988971337676
+========================================= ITER 470 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 1
+400 games played, discarded 1
+500 games played, discarded 1
+600 games played, discarded 1
+700 games played, discarded 2
+800 games played, discarded 2
+900 games played, discarded 4
+buffer score: 5.695291111110944
+score: 4.142100000000002
+turn : 60.563
+loss: 0.0033577871392481027
+========================================= ITER 471 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 3
+300 games played, discarded 3
+400 games played, discarded 3
+500 games played, discarded 5
+600 games played, discarded 6
+700 games played, discarded 7
+800 games played, discarded 8
+900 games played, discarded 9
+buffer score: 5.805724444444313
+score: 3.8869
+turn : 61.229
+loss: 0.003445526943542063
+========================================= ITER 472 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 0
+400 games played, discarded 1
+500 games played, discarded 1
+600 games played, discarded 1
+700 games played, discarded 1
+800 games played, discarded 1
+900 games played, discarded 2
+buffer score: 5.967711111110784
+score: 3.971300000000003
+turn : 61.579
+loss: 0.0035291934781707824
+========================================= ITER 473 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 1
+400 games played, discarded 2
+500 games played, discarded 4
+600 games played, discarded 7
+700 games played, discarded 8
+800 games played, discarded 9
+900 games played, discarded 9
+buffer score: 5.939848888888577
+score: 3.5749999999999935
+turn : 62.63
+loss: 0.0035667703254148365
+========================================= ITER 474 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 3
+300 games played, discarded 4
+400 games played, discarded 7
+500 games played, discarded 7
+600 games played, discarded 9
+700 games played, discarded 10
+800 games played, discarded 11
+900 games played, discarded 12
+buffer score: 5.787866666666441
+score: 3.3176999999999954
+turn : 63.328
+loss: 0.0034954096423462032
+========================================= ITER 475 ===================================
+0 games played, discarded 0
+100 games played, discarded 3
+200 games played, discarded 3
+300 games played, discarded 5
+400 games played, discarded 7
+500 games played, discarded 8
+600 games played, discarded 11
+700 games played, discarded 12
+800 games played, discarded 13
+900 games played, discarded 16
+buffer score: 5.6916466666664745
+score: 3.3996000000000035
+turn : 63.278
+loss: 0.0034334618621505797
+========================================= ITER 476 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 4
+300 games played, discarded 5
+400 games played, discarded 8
+500 games played, discarded 8
+600 games played, discarded 9
+700 games played, discarded 10
+800 games played, discarded 10
+900 games played, discarded 11
+buffer score: 5.621811111110966
+score: 3.3777999999999992
+turn : 63.32
+loss: 0.0033641024539247154
+========================================= ITER 477 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 3
+300 games played, discarded 3
+400 games played, discarded 5
+500 games played, discarded 6
+600 games played, discarded 9
+700 games played, discarded 11
+800 games played, discarded 11
+900 games played, discarded 13
+buffer score: 5.480551111111032
+score: 3.2345999999999977
+turn : 63.953
+loss: 0.0032709050457924603
+========================================= ITER 478 ===================================
+0 games played, discarded 0
+100 games played, discarded 3
+200 games played, discarded 5
+300 games played, discarded 5
+400 games played, discarded 7
+500 games played, discarded 9
+600 games played, discarded 12
+700 games played, discarded 15
+800 games played, discarded 21
+900 games played, discarded 22
+buffer score: 5.351302222222111
+score: 3.1284000000000014
+turn : 63.862
+loss: 0.003186389615293592
+========================================= ITER 479 ===================================
+0 games played, discarded 1
+100 games played, discarded 4
+200 games played, discarded 5
+300 games played, discarded 6
+400 games played, discarded 8
+500 games played, discarded 14
+600 games played, discarded 19
+700 games played, discarded 23
+800 games played, discarded 25
+900 games played, discarded 28
+buffer score: 5.213802222222095
+score: 2.8609000000000018
+turn : 64.283
+loss: 0.003098676337394863
+========================================= ITER 480 ===================================
+0 games played, discarded 0
+100 games played, discarded 4
+200 games played, discarded 9
+300 games played, discarded 13
+400 games played, discarded 14
+500 games played, discarded 19
+600 games played, discarded 25
+700 games played, discarded 28
+800 games played, discarded 34
+900 games played, discarded 39
+buffer score: 5.053448888888714
+score: 2.699000000000002
+turn : 65.134
+loss: 0.002951476201415062
+========================================= ITER 481 ===================================
+0 games played, discarded 0
+100 games played, discarded 5
+200 games played, discarded 9
+300 games played, discarded 11
+400 games played, discarded 16
+500 games played, discarded 22
+600 games played, discarded 30
+700 games played, discarded 37
+800 games played, discarded 42
+900 games played, discarded 47
+buffer score: 4.858773333333187
+score: 2.6007999999999973
+turn : 65.335
+loss: 0.0028223007754422723
+========================================= ITER 482 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 8
+300 games played, discarded 14
+400 games played, discarded 17
+500 games played, discarded 19
+600 games played, discarded 25
+700 games played, discarded 27
+800 games played, discarded 34
+900 games played, discarded 38
+buffer score: 4.769904444444314
+score: 2.7374
+turn : 65.179
+loss: 0.002660971984732896
+========================================= ITER 483 ===================================
+0 games played, discarded 0
+100 games played, discarded 5
+200 games played, discarded 8
+300 games played, discarded 14
+400 games played, discarded 16
+500 games played, discarded 18
+600 games played, discarded 20
+700 games played, discarded 25
+800 games played, discarded 30
+900 games played, discarded 32
+buffer score: 4.555962222222089
+score: 2.7122000000000015
+turn : 64.623
+loss: 0.0025483655370771886
+========================================= ITER 484 ===================================
+0 games played, discarded 0
+100 games played, discarded 7
+200 games played, discarded 13
+300 games played, discarded 14
+400 games played, discarded 19
+500 games played, discarded 21
+600 games played, discarded 26
+700 games played, discarded 34
+800 games played, discarded 37
+900 games played, discarded 42
+buffer score: 4.484051111110897
+score: 2.7220999999999975
+turn : 64.556
+loss: 0.00246120649157092
+========================================= ITER 485 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 4
+300 games played, discarded 6
+400 games played, discarded 11
+500 games played, discarded 18
+600 games played, discarded 24
+700 games played, discarded 28
+800 games played, discarded 34
+900 games played, discarded 36
+buffer score: 4.515593333333026
+score: 2.9477999999999978
+turn : 64.219
+loss: 0.0024225284974090755
+========================================= ITER 486 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 5
+300 games played, discarded 8
+400 games played, discarded 10
+500 games played, discarded 12
+600 games played, discarded 15
+700 games played, discarded 17
+800 games played, discarded 24
+900 games played, discarded 26
+buffer score: 4.517762222221973
+score: 2.762399999999999
+turn : 64.331
+loss: 0.0024128259962890295
+========================================= ITER 487 ===================================
+0 games played, discarded 0
+100 games played, discarded 6
+200 games played, discarded 11
+300 games played, discarded 13
+400 games played, discarded 16
+500 games played, discarded 20
+600 games played, discarded 24
+700 games played, discarded 29
+800 games played, discarded 32
+900 games played, discarded 36
+buffer score: 4.434326666666466
+score: 2.718600000000005
+turn : 64.193
+loss: 0.0023119854019023477
+========================================= ITER 488 ===================================
+0 games played, discarded 0
+100 games played, discarded 6
+200 games played, discarded 14
+300 games played, discarded 16
+400 games played, discarded 16
+500 games played, discarded 22
+600 games played, discarded 23
+700 games played, discarded 26
+800 games played, discarded 27
+900 games played, discarded 30
+buffer score: 4.470566666666486
+score: 2.8656000000000024
+turn : 64.136
+loss: 0.0023332817025948317
+========================================= ITER 489 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 4
+300 games played, discarded 6
+400 games played, discarded 12
+500 games played, discarded 13
+600 games played, discarded 14
+700 games played, discarded 17
+800 games played, discarded 21
+900 games played, discarded 26
+buffer score: 4.4745266666664945
+score: 2.9190000000000005
+turn : 64.448
+loss: 0.002335864637279883
+========================================= ITER 490 ===================================
+0 games played, discarded 0
+100 games played, discarded 5
+200 games played, discarded 7
+300 games played, discarded 11
+400 games played, discarded 13
+500 games played, discarded 15
+600 games played, discarded 24
+700 games played, discarded 32
+800 games played, discarded 34
+900 games played, discarded 39
+buffer score: 4.519322222222124
+score: 2.7500000000000036
+turn : 64.558
+loss: 0.0023196139943320302
+========================================= ITER 491 ===================================
+0 games played, discarded 0
+100 games played, discarded 4
+200 games played, discarded 7
+300 games played, discarded 12
+400 games played, discarded 15
+500 games played, discarded 22
+600 games played, discarded 31
+700 games played, discarded 34
+800 games played, discarded 35
+900 games played, discarded 35
+buffer score: 4.572737777777657
+score: 2.816000000000002
+turn : 65.05
+loss: 0.0023224984528496862
+========================================= ITER 492 ===================================
+0 games played, discarded 0
+100 games played, discarded 4
+200 games played, discarded 10
+300 games played, discarded 13
+400 games played, discarded 17
+500 games played, discarded 19
+600 games played, discarded 24
+700 games played, discarded 26
+800 games played, discarded 31
+900 games played, discarded 36
+buffer score: 4.587886666666484
+score: 2.7668000000000013
+turn : 64.488
+loss: 0.0023372585978358985
+========================================= ITER 493 ===================================
+0 games played, discarded 0
+100 games played, discarded 6
+200 games played, discarded 12
+300 games played, discarded 16
+400 games played, discarded 24
+500 games played, discarded 28
+600 games played, discarded 36
+700 games played, discarded 44
+800 games played, discarded 49
+900 games played, discarded 55
+buffer score: 4.58360666666646
+score: 2.4992000000000028
+turn : 65.36
+loss: 0.002363540035439655
+========================================= ITER 494 ===================================
+0 games played, discarded 0
+100 games played, discarded 11
+200 games played, discarded 21
+300 games played, discarded 27
+400 games played, discarded 36
+500 games played, discarded 45
+600 games played, discarded 54
+700 games played, discarded 60
+800 games played, discarded 68
+900 games played, discarded 77
+buffer score: 4.490337777777625
+score: 2.2724
+turn : 64.188
+loss: 0.0023630294832400977
+========================================= ITER 495 ===================================
+0 games played, discarded 0
+100 games played, discarded 9
+200 games played, discarded 20
+300 games played, discarded 28
+400 games played, discarded 37
+500 games played, discarded 44
+600 games played, discarded 52
+700 games played, discarded 56
+800 games played, discarded 66
+900 games played, discarded 75
+buffer score: 4.375484444444297
+score: 2.3008999999999977
+turn : 64.296
+loss: 0.00229270784300752
+========================================= ITER 496 ===================================
+0 games played, discarded 0
+100 games played, discarded 7
+200 games played, discarded 11
+300 games played, discarded 21
+400 games played, discarded 33
+500 games played, discarded 42
+600 games played, discarded 55
+700 games played, discarded 63
+800 games played, discarded 72
+900 games played, discarded 78
+buffer score: 4.256011111110998
+score: 2.2852
+turn : 64.972
+loss: 0.0021699581563007085
+========================================= ITER 497 ===================================
+0 games played, discarded 0
+100 games played, discarded 10
+200 games played, discarded 18
+300 games played, discarded 22
+400 games played, discarded 32
+500 games played, discarded 36
+600 games played, discarded 47
+700 games played, discarded 55
+800 games played, discarded 64
+900 games played, discarded 73
+buffer score: 4.16662444444432
+score: 2.1900999999999993
+turn : 64.185
+loss: 0.0021603781857993452
+========================================= ITER 498 ===================================
+0 games played, discarded 0
+100 games played, discarded 17
+200 games played, discarded 25
+300 games played, discarded 33
+400 games played, discarded 43
+500 games played, discarded 46
+600 games played, discarded 54
+700 games played, discarded 63
+800 games played, discarded 70
+900 games played, discarded 80
+buffer score: 4.088135555555387
+score: 2.1436000000000046
+turn : 64.689
+loss: 0.0021448378427885474
+========================================= ITER 499 ===================================
+0 games played, discarded 0
+100 games played, discarded 8
+200 games played, discarded 13
+300 games played, discarded 26
+400 games played, discarded 34
+500 games played, discarded 39
+600 games played, discarded 46
+700 games played, discarded 51
+800 games played, discarded 56
+900 games played, discarded 61
+buffer score: 4.001491111110932
+score: 2.174999999999997
+turn : 64.374
+loss: 0.0021118173154536634
+========================================= ITER 500 ===================================
+0 games played, discarded 3
+100 games played, discarded 9
+200 games played, discarded 23
+300 games played, discarded 27
+400 games played, discarded 38
+500 games played, discarded 44
+600 games played, discarded 51
+700 games played, discarded 60
+800 games played, discarded 70
+900 games played, discarded 80
+buffer score: 3.947791111111
+score: 2.2211000000000025
+turn : 63.549
+loss: 0.0020451624016277494
+========================================= ITER 501 ===================================
+0 games played, discarded 0
+100 games played, discarded 7
+200 games played, discarded 12
+300 games played, discarded 21
+400 games played, discarded 29
+500 games played, discarded 38
+600 games played, discarded 55
+700 games played, discarded 63
+800 games played, discarded 75
+900 games played, discarded 88
+buffer score: 3.8829355555554637
+score: 2.221799999999998
+turn : 63.308
+loss: 0.002010766710154712
+========================================= ITER 502 ===================================
+0 games played, discarded 0
+100 games played, discarded 3
+200 games played, discarded 11
+300 games played, discarded 18
+400 games played, discarded 25
+500 games played, discarded 34
+600 games played, discarded 44
+700 games played, discarded 49
+800 games played, discarded 52
+900 games played, discarded 58
+buffer score: 3.863388888888791
+score: 2.3575000000000017
+turn : 64.39
+loss: 0.0019923302123788745
+========================================= ITER 503 ===================================
+0 games played, discarded 0
+100 games played, discarded 8
+200 games played, discarded 12
+300 games played, discarded 18
+400 games played, discarded 23
+500 games played, discarded 26
+600 games played, discarded 33
+700 games played, discarded 38
+800 games played, discarded 42
+900 games played, discarded 42
+buffer score: 3.8080755555555146
+score: 2.434899999999995
+turn : 64.54
+loss: 0.0019233830785378814
+========================================= ITER 504 ===================================
+0 games played, discarded 0
+100 games played, discarded 4
+200 games played, discarded 11
+300 games played, discarded 17
+400 games played, discarded 21
+500 games played, discarded 28
+600 games played, discarded 32
+700 games played, discarded 33
+800 games played, discarded 35
+900 games played, discarded 43
+buffer score: 3.9842000000000852
+score: 2.7293000000000003
+turn : 64.142
+loss: 0.0020523215644061565
+========================================= ITER 505 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 4
+300 games played, discarded 5
+400 games played, discarded 7
+500 games played, discarded 13
+600 games played, discarded 16
+700 games played, discarded 22
+800 games played, discarded 29
+900 games played, discarded 36
+buffer score: 4.155564444444515
+score: 2.922900000000004
+turn : 63.089
+loss: 0.0021369619062170386
+========================================= ITER 506 ===================================
+0 games played, discarded 0
+100 games played, discarded 6
+200 games played, discarded 10
+300 games played, discarded 14
+400 games played, discarded 16
+500 games played, discarded 23
+600 games played, discarded 25
+700 games played, discarded 26
+800 games played, discarded 32
+900 games played, discarded 34
+buffer score: 4.303715555555637
+score: 2.868299999999996
+turn : 62.867
+loss: 0.002197877351427451
+========================================= ITER 507 ===================================
+0 games played, discarded 1
+100 games played, discarded 4
+200 games played, discarded 11
+300 games played, discarded 13
+400 games played, discarded 17
+500 games played, discarded 20
+600 games played, discarded 25
+700 games played, discarded 30
+800 games played, discarded 31
+900 games played, discarded 34
+buffer score: 4.37433777777784
+score: 2.858800000000001
+turn : 63.118
+loss: 0.0022756492451298984
+========================================= ITER 508 ===================================
+0 games played, discarded 0
+100 games played, discarded 4
+200 games played, discarded 8
+300 games played, discarded 14
+400 games played, discarded 17
+500 games played, discarded 17
+600 games played, discarded 20
+700 games played, discarded 25
+800 games played, discarded 30
+900 games played, discarded 33
+buffer score: 4.542984444444558
+score: 3.033300000000001
+turn : 62.446
+loss: 0.0023345843516290187
+========================================= ITER 509 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 4
+300 games played, discarded 4
+400 games played, discarded 5
+500 games played, discarded 6
+600 games played, discarded 9
+700 games played, discarded 10
+800 games played, discarded 10
+900 games played, discarded 11
+buffer score: 4.70329111111122
+score: 3.299099999999999
+turn : 61.671
+loss: 0.002443695634137839
+========================================= ITER 510 ===================================
+0 games played, discarded 0
+100 games played, discarded 3
+200 games played, discarded 4
+300 games played, discarded 9
+400 games played, discarded 11
+500 games played, discarded 11
+600 games played, discarded 11
+700 games played, discarded 14
+800 games played, discarded 15
+900 games played, discarded 18
+buffer score: 4.8639600000001195
+score: 3.397500000000002
+turn : 61.54
+loss: 0.002555084240157157
+========================================= ITER 511 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 1
+300 games played, discarded 2
+400 games played, discarded 2
+500 games played, discarded 3
+600 games played, discarded 3
+700 games played, discarded 4
+800 games played, discarded 5
+900 games played, discarded 5
+buffer score: 4.973426666666774
+score: 3.2922999999999987
+turn : 61.79
+loss: 0.0025856323703192176
+========================================= ITER 512 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 2
+300 games played, discarded 4
+400 games played, discarded 6
+500 games played, discarded 6
+600 games played, discarded 7
+700 games played, discarded 11
+800 games played, discarded 13
+900 games played, discarded 14
+buffer score: 5.012277777777892
+score: 3.251500000000001
+turn : 61.45
+loss: 0.002600417274516076
+========================================= ITER 513 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 1
+400 games played, discarded 3
+500 games played, discarded 4
+600 games played, discarded 5
+700 games played, discarded 5
+800 games played, discarded 6
+900 games played, discarded 8
+buffer score: 5.00641555555552
+score: 3.343800000000004
+turn : 61.605
+loss: 0.0026337132370099427
+========================================= ITER 514 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 3
+300 games played, discarded 7
+400 games played, discarded 9
+500 games played, discarded 9
+600 games played, discarded 12
+700 games played, discarded 15
+800 games played, discarded 18
+900 games played, discarded 19
+buffer score: 5.003108888888694
+score: 3.1891999999999974
+turn : 61.931
+loss: 0.0026345110195688903
+========================================= ITER 515 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 4
+300 games played, discarded 5
+400 games played, discarded 6
+500 games played, discarded 8
+600 games played, discarded 9
+700 games played, discarded 10
+800 games played, discarded 13
+900 games played, discarded 14
+buffer score: 4.938864444444314
+score: 3.138999999999996
+turn : 62.288
+loss: 0.0025924280006438495
+========================================= ITER 516 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 3
+300 games played, discarded 3
+400 games played, discarded 4
+500 games played, discarded 7
+600 games played, discarded 9
+700 games played, discarded 11
+800 games played, discarded 11
+900 games played, discarded 13
+buffer score: 4.932071111110995
+score: 3.2193999999999967
+turn : 62.406
+loss: 0.002659438312985003
+========================================= ITER 517 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 5
+300 games played, discarded 6
+400 games played, discarded 10
+500 games played, discarded 13
+600 games played, discarded 14
+700 games played, discarded 14
+800 games played, discarded 14
+900 games played, discarded 17
+buffer score: 4.92086444444431
+score: 3.040099999999998
+turn : 62.847
+loss: 0.0025996671826578675
+========================================= ITER 518 ===================================
+0 games played, discarded 0
+100 games played, discarded 5
+200 games played, discarded 8
+300 games played, discarded 12
+400 games played, discarded 14
+500 games played, discarded 16
+600 games played, discarded 19
+700 games played, discarded 26
+800 games played, discarded 29
+900 games played, discarded 32
+buffer score: 4.867348888888744
+score: 2.8348999999999984
+turn : 63.708
+loss: 0.0026136267569381744
+========================================= ITER 519 ===================================
+0 games played, discarded 0
+100 games played, discarded 6
+200 games played, discarded 9
+300 games played, discarded 10
+400 games played, discarded 15
+500 games played, discarded 18
+600 games played, discarded 19
+700 games played, discarded 22
+800 games played, discarded 25
+900 games played, discarded 28
+buffer score: 4.802306666666479
+score: 2.8879000000000046
+turn : 63.5
+loss: 0.002504049292765558
+========================================= ITER 520 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 5
+300 games played, discarded 10
+400 games played, discarded 13
+500 games played, discarded 14
+600 games played, discarded 14
+700 games played, discarded 19
+800 games played, discarded 24
+900 games played, discarded 25
+buffer score: 4.68546222222198
+score: 2.8454000000000006
+turn : 63.364
+loss: 0.002460754349594936
+========================================= ITER 521 ===================================
+0 games played, discarded 0
+100 games played, discarded 3
+200 games played, discarded 7
+300 games played, discarded 11
+400 games played, discarded 16
+500 games played, discarded 17
+600 games played, discarded 20
+700 games played, discarded 27
+800 games played, discarded 28
+900 games played, discarded 29
+buffer score: 4.563968888888724
+score: 2.8172999999999964
+turn : 63.923
+loss: 0.002455691514769569
+========================================= ITER 522 ===================================
+0 games played, discarded 0
+100 games played, discarded 3
+200 games played, discarded 7
+300 games played, discarded 12
+400 games played, discarded 12
+500 games played, discarded 13
+600 games played, discarded 14
+700 games played, discarded 18
+800 games played, discarded 20
+900 games played, discarded 20
+buffer score: 4.49124444444429
+score: 2.826399999999999
+turn : 63.614
+loss: 0.0023404379328712823
+========================================= ITER 523 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 3
+300 games played, discarded 5
+400 games played, discarded 6
+500 games played, discarded 6
+600 games played, discarded 10
+700 games played, discarded 12
+800 games played, discarded 15
+900 games played, discarded 18
+buffer score: 4.452382222222022
+score: 2.8893
+turn : 63.257
+loss: 0.0023578180884942413
+========================================= ITER 524 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 5
+300 games played, discarded 7
+400 games played, discarded 10
+500 games played, discarded 12
+600 games played, discarded 14
+700 games played, discarded 14
+800 games played, discarded 17
+900 games played, discarded 19
+buffer score: 4.4658822222221035
+score: 3.017900000000001
+turn : 63.162
+loss: 0.0023490862490143627
+========================================= ITER 525 ===================================
+0 games played, discarded 0
+100 games played, discarded 2
+200 games played, discarded 4
+300 games played, discarded 6
+400 games played, discarded 6
+500 games played, discarded 9
+600 games played, discarded 10
+700 games played, discarded 14
+800 games played, discarded 15
+900 games played, discarded 15
+buffer score: 4.5351088888888516
+score: 3.073799999999999
+turn : 62.913
+loss: 0.002387307680910453
+========================================= ITER 526 ===================================
+0 games played, discarded 0
+100 games played, discarded 4
+200 games played, discarded 6
+300 games played, discarded 7
+400 games played, discarded 11
+500 games played, discarded 15
+600 games played, discarded 20
+700 games played, discarded 21
+800 games played, discarded 24
+900 games played, discarded 26
+buffer score: 4.50385111111102
+score: 2.9360999999999993
+turn : 63.007
+loss: 0.0023561176378279923
+========================================= ITER 527 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 1
+400 games played, discarded 3
+500 games played, discarded 4
+600 games played, discarded 6
+700 games played, discarded 7
+800 games played, discarded 9
+900 games played, discarded 10
+buffer score: 4.651842222222159
+score: 3.3145000000000007
+turn : 62.152
+loss: 0.0024274036462884397
+========================================= ITER 528 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 1
+300 games played, discarded 3
+400 games played, discarded 3
+500 games played, discarded 6
+600 games played, discarded 8
+700 games played, discarded 10
+800 games played, discarded 10
+900 games played, discarded 14
+buffer score: 4.749448888888765
+score: 3.3132999999999977
+turn : 61.859
+loss: 0.002523711705580354
+========================================= ITER 529 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 2
+400 games played, discarded 3
+500 games played, discarded 4
+600 games played, discarded 4
+700 games played, discarded 5
+800 games played, discarded 6
+900 games played, discarded 6
+buffer score: 4.90727555555546
+score: 3.6839999999999997
+turn : 60.985
+loss: 0.0026321488246321676
+========================================= ITER 530 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 2
+300 games played, discarded 4
+400 games played, discarded 4
+500 games played, discarded 5
+600 games played, discarded 5
+700 games played, discarded 5
+800 games played, discarded 5
+900 games played, discarded 6
+buffer score: 5.172117777777672
+score: 3.8942999999999994
+turn : 60.072
+loss: 0.002702818678226322
+========================================= ITER 531 ===================================
+0 games played, discarded 0
+100 games played, discarded 0
+200 games played, discarded 0
+300 games played, discarded 5
+400 games played, discarded 5
+500 games played, discarded 5
+600 games played, discarded 5
+700 games played, discarded 6
+800 games played, discarded 6
+900 games played, discarded 7
+buffer score: 5.33773555555546
+score: 3.622999999999998
+turn : 60.75
+loss: 0.002786703556776047
+========================================= ITER 532 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 1
+300 games played, discarded 2
+400 games played, discarded 3
+500 games played, discarded 4
+600 games played, discarded 6
+700 games played, discarded 6
+800 games played, discarded 6
+900 games played, discarded 7
+buffer score: 5.428642222222129
+score: 3.7129999999999987
+turn : 61.12
+loss: 0.002852528647053987
+========================================= ITER 533 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 2
+300 games played, discarded 2
+400 games played, discarded 2
+500 games played, discarded 2
+600 games played, discarded 2
+700 games played, discarded 4
+800 games played, discarded 6
+900 games played, discarded 9
+buffer score: 5.442015555555597
+score: 3.5180999999999916
+turn : 61.501
+loss: 0.0028779659420251845
+========================================= ITER 534 ===================================
+0 games played, discarded 0
+100 games played, discarded 1
+200 games played, discarded 1
+300 games played, discarded 3
+400 games played, discarded 4

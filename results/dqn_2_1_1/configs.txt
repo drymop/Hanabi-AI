@@ -1,0 +1,17 @@
+trainer: DQNTrainer2,
+model: DQNModel2ver1,
+
+game_configs: {
+    n_players: 3,
+    max_fuses: 50    
+}
+
+model_configs: {
+    learn_rate: 2e-4,
+    n_rnn_hidden = 64,
+}
+
+train_configs: {
+    batch_size = 128
+    time_steps = 32
+}

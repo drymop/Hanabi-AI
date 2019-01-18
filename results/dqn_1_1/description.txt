@@ -1,0 +1,12 @@
+DQNModel.py
+
+nPlayers = 3
+nHiddens = 64
+batchSize = 128
+timeSteps = 32
+
+1000 games per iteration
+exploration: start at 1, go down by 0.1 each iter, cap at 0.1
+discount rate: 0.99 
+
+scoring: simply use the number of tiles in firework pile
