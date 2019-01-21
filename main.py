@@ -1,4 +1,4 @@
-from StandardGame import Game
+from game import Game
 from pprint import pprint
 from ConsoleDisplay import display
 from RandomPlayer import getAction
@@ -6,7 +6,7 @@ import random
 
 g = Game(3)
 
-PRINT_KEY = ['deckSize', 'hands', 'curPlayer', 'hints', 'nHintTokens', 'fireworkPile', 'nFuseTokens', 'score']
+PRINT_KEY = ['deck_size', 'hands', 'cur_player', 'hints', 'n_hint_tokens', 'fireworkPile', 'n_fuse_tokens', 'score']
 RANKS  = ('1', '2', '3', '4', '5')
 COLORS = ('B', 'G', 'R', 'W', 'Y')
 
@@ -15,7 +15,7 @@ COLORS = ('B', 'G', 'R', 'W', 'Y')
 #   if action.type == 'PLAY' or action.type == 'DISCARD':
 #     print((action.targetTile+1))
 #   elif action.type == 'HINT':
-#     print((action.targetPlayer+game.curPlayer+1)%game.N_PLAYERS, end = " ")
+#     print((action.targetPlayer+game.cur_player+1)%game.N_PLAYERS, end = " ")
 #     if action.hintIsColor:
 #       print(COLORS[action.hintAttribute])
 #     else:
@@ -58,7 +58,7 @@ da.targetTile = 0
 
 while True:
   g = Game(random.randint(2,5))
-  while not g.isOver():
+  while not g.is_over():
     dd()
     a = getAction(g)
     print()

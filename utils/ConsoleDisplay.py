@@ -1,5 +1,5 @@
 from pprint import pprint
-from StandardGame import ActionType
+from game import ActionType
 
 RANKS  = ('1', '2', '3', '4', '5')
 COLORS = ('B', 'G', 'R', 'W', 'Y')

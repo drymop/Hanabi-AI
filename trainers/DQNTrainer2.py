@@ -5,7 +5,7 @@ import random
 import tensorflow as tf
 from pprint import pprint as pp
 
-from StandardGame import Game
+from game import Game
 from models.DQNModel2ver1 import Model
 from utils.ConsoleDisplay import displayState, displayAction
 from utils.ExperienceBuffer import Experience, ExperienceBuffer
@@ -54,7 +54,7 @@ class Trainer:
 
     def createGameStates(self, g, last_action=-1):
         '''
-        Create n states (n = g.nPlayers), each is a game state from each player's point of view
+        Create n states (n = g.n_players), each is a game state from each player's point of view
         '''
         cur_player = [(g.curPlayer-player)%g.nPlayers for player in range(g.nPlayers)]
 
@@ -71,12 +71,12 @@ class Trainer:
         fireworks = [g.fireworks.copy()] * g.nPlayers
         action_and_rewards = [[-1, 0] for _ in range(g.nPlayers)]
         
-        if g.isOver():
+        if g.is_over():
             valid_masks = [self.maskZeros] * g.nPlayers
             loss_masks = valid_masks
         else:
             valid_masks = [g.getValidActions() if p == g.curPlayer else self.maskNonCurPlayer for p in range(g.nPlayers)]
-            #loss_masks = [self.maskOnes if p == g.curPlayer else self.maskZeros for p in range(g.nPlayers)]
+            #loss_masks = [self.maskOnes if p == g.cur_player else self.maskZeros for p in range(g.n_players)]
             loss_masks = [self.maskOnes] * g.nPlayers
 
         states = [GameState(*t) for t in zip(cur_player, remain_tiles, hands, hints, hint_tokens, fuse_tokens, fireworks, action_and_rewards, valid_masks, loss_masks)]
@@ -99,7 +99,7 @@ class Trainer:
 
         rnnStateTuple = self.gameZeroState
         score = self.eval(game)
-        while not game.isOver():
+        while not game.is_over():
 
             gStates = self.createGameStates(game)
             for player in range(game.nPlayers):
@@ -134,7 +134,75 @@ class Trainer:
                 print('\nAction: {}'.format(actionInd))
                 displayAction(game, action)
                 print()
-                input()
+                input('Press ENTER...')
+
+
+            game.play(action)
+
+            # get reward
+            newScore = self.eval(game)
+            for state in gStates:
+                state.action_and_reward[1] = newScore - score
+            score = newScore
+            
+
+        if show:
+            displayState(game, False)
+            print(game.score, end=" ")
+            print(game.nFuseTokens)
+
+        # Add the terminal state, as well as pad to minimum required length
+        nTurn = len(timeSeries[0])
+        pad = max(0, minLength - nTurn) + 1
+        terminalStates = self.createGameStates(game)
+        for _ in range(pad):
+            for player in range(game.nPlayers):
+                    timeSeries[player].append(terminalStates[player])
+
+        return score, nTurn, timeSeries
+
+    def play_batch(self, batch_size, min_length, explore_rate=0.1):
+        # 2d array of state, recording the time series of each player
+        timeSeries = [[] for _ in range(game.nPlayers)]
+
+        rnnStateTuple = self.gameZeroState
+        score = self.eval(game)
+        while not game.is_over():
+
+            gStates = self.createGameStates(game)
+            for player in range(game.nPlayers):
+                timeSeries[player].append(gStates[player])
+
+            x = Trainer.formatBatch([s] for s in gStates)
+
+            batchQValues, rnnStateTuple = self.trainModel.predict(x, rnnStateTuple)
+
+            # get the q-prediction of the current player at the only time step
+            qValues = batchQValues[game.curPlayer][-1]
+            
+            validActions = game.getValidActions()
+
+            if random.random() > explore_rate:
+                # choose action with max q value
+                m = max(qValues[i] for i in range(len(qValues)) if validActions[i])
+                choices = [i for i in range(len(qValues)) if qValues[i] == m]
+            else:
+                # choose action randomly
+                choices = [i for i, b in enumerate(validActions) if b]
+            actionInd = random.choice(choices)
+            action = game.actions[actionInd]
+
+            # save the action
+            gStates[game.curPlayer].action_and_reward[0] = actionInd
+
+            if show:
+                displayState(game, firstPerson=False)
+                pp(batchQValues)
+
+                print('\nAction: {}'.format(actionInd))
+                displayAction(game, action)
+                print()
+                input('Press ENTER...')
 
 
             game.play(action)
@@ -172,7 +240,7 @@ class Trainer:
 
         #rnnStateTuple = self.gameZeroState
         score = self.eval(game)
-        while not game.isOver():
+        while not game.is_over():
             gStates = self.createGameStates(game)
             for player in range(game.nPlayers):
                 timeSeries[player].append(gStates[player])
@@ -251,6 +319,7 @@ class Trainer:
             t = Trainer.formatBatch(batch)
 
             loss = self.trainModel.train(Trainer.formatBatch(batch), self.batchZeroState, targetQ)
+            print(loss)
             avgLoss += loss
         return avgLoss / epoch
 
@@ -259,9 +328,10 @@ class Trainer:
         print('==================================== FILLING BUFFER ===================================')
         avgScore = 0
         avgTurn = 0
-        nGames = self.bufferSize//self.nPlayers//2
+        # n_random_games = self.bufferSize//self.n_players//2
+        n_random_games = 1
         i = 0
-        while i < nGames:
+        while i < n_random_games:
             game = Game(self.nPlayers)
             score, nTurn, timeSeries = self.playRandom(game, self.timeSteps)
 
@@ -275,8 +345,8 @@ class Trainer:
                 print('buffer score: {}'.format(self.experienceBuffer.avgScore))
                 print('score: {}'.format(avgScore / i))
                 print('turn : {}'.format(avgTurn / i))
-        print('score: {}'.format(avgScore / nGames))
-        print('turn : {}'.format(avgTurn / nGames))
+        print('score: {}'.format(avgScore / n_random_games))
+        print('turn : {}'.format(avgTurn / n_random_games))
 
         explore_rate = max(startExploreRate-(startIteration-1)*exploreDecrease, endExploreRate)
 
@@ -301,7 +371,7 @@ class Trainer:
             sample_game_score = 0
             sample_deaths = 0
             sample_turns = 0
-            sample_games = 1000
+            sample_games = 500
             i = 0
             while i < sample_games:
                 game = Game(self.nPlayers)
@@ -313,7 +383,7 @@ class Trainer:
                     self.experienceBuffer.add(Experience(score, s), weighted=True)
                 sample_score += score
                 sample_game_score += game.score
-                sample_deaths += Game.MAX_FUSES - game.nFuseTokens
+                sample_deaths += Game.MAX_FUSES - game.n_fuse_tokens
                 sample_turns += nTurn
                 if (i % 100) == 0:
                     print('{} sample games played, discarded {}'.format(i, sample_discarded))
@@ -339,7 +409,7 @@ class Trainer:
                 score, nTurn, timeSeries = self.play(game, self.timeSteps, explore_rate=0)
                 valid_score += score
                 valid_game_score += game.score
-                valid_deaths += Game.MAX_FUSES - game.nFuseTokens
+                valid_deaths += Game.MAX_FUSES - game.n_fuse_tokens
                 valid_turns += nTurn
                 i += 1
             print('{} validation games played'.format(i))
@@ -394,20 +464,19 @@ nHiddens = 64
 batchSize = 128
 timeSteps = 32
 nPlayers = 3
-learn_rate = 1e-3
+learn_rate = 1e-5
 
 trainer = Trainer(3, nHiddens, 2, learn_rate, batchSize, timeSteps)
 
 load_folder = 'save'
-loadIter = 200
+loadIter = 0
 if loadIter > 0:
     trainer.trainModel.load_checkpoint(folder=load_folder, filename=Trainer.checkpointFile(loadIter))
 
-while True:
-    game = Game(nPlayers)
-    trainer.play(game, timeSteps, explore_rate=0, show=True)
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    input()
-
+# while True:
+#     game = Game(n_players)
+#     trainer.play(game, timeSteps, explore_rate=0, show=True)
+#     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+#     input()
 
 trainer.start(startIteration=loadIter+1, startExploreRate=0.8, endExploreRate=0.2, exploreDecrease=0.01)

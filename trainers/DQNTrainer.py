@@ -4,7 +4,7 @@ import random
 import tensorflow as tf
 from pprint import pprint as pp
 
-from StandardGame import Game
+from game import Game
 from models.DQNModel2 import Model
 from utils.ConsoleDisplay import displayState, displayAction
 from utils.ExperienceBuffer import Experience, ExperienceBuffer
@@ -58,7 +58,7 @@ class Trainer:
 
     def createGameStates(self, g):
         '''
-        Create n states (n = g.nPlayers), each is a game state from each player's point of view
+        Create n states (n = g.n_players), each is a game state from each player's point of view
         '''
         cur_player = [self.onehotPlayers[(g.curPlayer-player)%g.nPlayers] for player in range(g.nPlayers)]
 
@@ -75,7 +75,7 @@ class Trainer:
         fireworks = [g.fireworks] * g.nPlayers
         action_and_rewards = [[-1, 0] for _ in range(g.nPlayers)]
         
-        if g.isOver():
+        if g.is_over():
             valid_masks = [self.maskZeros] * g.nPlayers
             loss_masks = valid_masks
         else:
@@ -103,7 +103,7 @@ class Trainer:
 
         rnnStateTuple = self.gameZeroState
         score = self.getScore(game)
-        while not game.isOver():
+        while not game.is_over():
 
             gStates = self.createGameStates(game)
             for player in range(game.nPlayers):
@@ -171,7 +171,7 @@ class Trainer:
 
         #rnnStateTuple = self.gameZeroState
         score = self.getScore(game)
-        while not game.isOver():
+        while not game.is_over():
             gStates = self.createGameStates(game)
             for player in range(game.nPlayers):
                 timeSeries[player].append(gStates[player])
@@ -258,10 +258,10 @@ class Trainer:
         # print('==================================== FILLING BUFFER ===================================')
         # avgScore = 0
         # avgTurn = 0
-        # nGames = self.bufferSize//self.nPlayers//2
+        # nGames = self.bufferSize//self.n_players//2
         # i = 0
         # while i < nGames:
-        #     game = Game(self.nPlayers)
+        #     game = Game(self.n_players)
         #     score, nTurn, timeSeries = self.playRandom(game, self.timeSteps)
 
         #     i += 1
