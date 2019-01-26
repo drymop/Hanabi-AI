@@ -1,8 +1,8 @@
 from collections import namedtuple
+from enum import Enum
 from itertools import product as cartesian_product
 from random import shuffle
 
-from enum import Enum
 
 Tile = namedtuple('Tile', 'rank suit id')
 
@@ -33,7 +33,7 @@ class Game(object):
     # list of all unique tile types (= RANKS x SUITS)
     # to translate between tile type and tile index, the formula is
     # tileId = rank * 5 + color
-    TILE_TYPES = tuple(Tile(rank=t[0], suit=t[1], id=N_SUITS*t[0]+t[1]) for t in cartesian_product(RANKS, SUITS))
+    TILE_TYPES = tuple(Tile(rank=t[0], suit=t[1], id=5*t[0]+t[1])for t in cartesian_product(RANKS, SUITS))
     N_TYPES = len(TILE_TYPES)
     # Number of tile for each rank of a color. E.g there are only 1 Five of each color, 
     # so Game.N_TILES_PER_RANK[4] = 1.
@@ -62,9 +62,9 @@ class Game(object):
         self.n_hint_tokens = Game.MAX_HINTS
         self.n_fuse_tokens = Game.MAX_FUSES
 
-        # game score
+        # game progress
         self.score = 0
-        self.MAX_SCORE = Game.N_SUITS * Game.N_RANKS
+        self.n_turns = 0
 
         # number of players
         self.cur_player = 0
@@ -84,49 +84,52 @@ class Game(object):
         self.actions = []
         for i in range(self.hand_size):
             ac = Action(ActionType.PLAY)
-            ac.targetTile = i
+            ac.target_tile = i
             self.actions.append(ac)
         for i in range(self.hand_size):
             ac = Action(ActionType.DISCARD)
-            ac.targetTile = i
+            ac.target_tile = i
             self.actions.append(ac)
         for p in range(1, self.n_players):
             for r in Game.RANKS:
                 ac = Action(ActionType.HINT)
-                ac.targetPlayer = p
-                ac.hintAttribute = r
-                ac.hintIsColor = False
+                ac.target_player = p
+                ac.hint_attribute = r
+                ac.hint_is_color = False
                 self.actions.append(ac)
             for c in Game.SUITS:
                 ac = Action(ActionType.HINT)
-                ac.targetPlayer = p
-                ac.hintAttribute = c
-                ac.hintIsColor = True
+                ac.target_player = p
+                ac.hint_attribute = c
+                ac.hint_is_color = True
                 self.actions.append(ac)
         self.actions.append(Action(ActionType.NONE))  # do nothing
         self.n_actions = Game.ACTIONS_PER_N_PLAYERS[self.n_players]
 
+        # whether game is over or not
+        self.is_over = False
+
         # list of valid actions for current player
-        self.valid_actions = [1] * self.n_actions
-        self.valid_actions[-1] = 0  # current player cannot do nothing during his turn
+        self.is_valid_action = [True] * self.n_actions
+        self.is_valid_action[-1] = False  # current player cannot do nothing during his turn
         self._recalculate_valid_actions()
 
-    def is_over(self):
-        """
-        Returns: True if game is over
-        """
-        return self.n_fuse_tokens <= 0 or self.deck_size <= 0 or self.score == 25
-
     def _recalculate_valid_actions(self):
-        """Recalculates which actions are valid, stores the result in self.valid_actions"""
-        act_ind = 2 * self.hand_size  # action index of first hint action
+        """Recalculates which actions are valid, stores the result in self.is_valid_action"""
+        # if game is over, no action is possible
+        if self.is_over:
+            for i in range(self.n_actions):
+                self.is_valid_action[i] = False
+                return
+
+        act_ind = 2 * self.hand_size  # skip play and discard actions, as they are always valid
         # cannot hint
         if self.n_hint_tokens <= 0:
             for i in range(act_ind, self.n_actions-1):
-                self.valid_actions[i] = False
+                self.is_valid_action[i] = False
             return
 
-        # hint for each player
+        # hint to each player
         for i in range(1, self.n_players):
             p = (self.cur_player + i) % self.n_players
             hand = self.hands[p]
@@ -135,9 +138,9 @@ class Game(object):
             for tile in hand:
                 has_rank[tile.rank] = 1
                 has_suit[tile.suit] = 1
-            self.valid_actions[act_ind:act_ind+Game.N_RANKS] = has_rank
+            self.is_valid_action[act_ind:act_ind + Game.N_RANKS] = has_rank
             act_ind += Game.N_RANKS
-            self.valid_actions[act_ind:act_ind + Game.N_SUITS] = has_suit
+            self.is_valid_action[act_ind:act_ind + Game.N_SUITS] = has_suit
             act_ind += Game.N_SUITS
 
     def play(self, action):
@@ -151,16 +154,18 @@ class Game(object):
             raise ValueError("Expected action type to be 'PLAY', 'DISCARD' or 'HINT'; got '%r'".format(action.type))
         
         # move to next player
+        self.n_turns += 1
         self.cur_player = (self.cur_player + 1) % self.n_players
+        self.is_over = self.n_fuse_tokens <= 0 or self.deck_size <= 0 or self.score == Game.MAX_SCORE
         self._recalculate_valid_actions()
 
     def _process_play(self, action):
-        tile = self.hands[self.cur_player][action.targetTile]
+        tile = self.hands[self.cur_player][action.target_tile]
         # remove the played tile from play
         self.n_tiles_per_type[tile.id] -= 1
         # draw new tile, init hint for the new tile
-        self.hands[self.cur_player][action.targetTile] = self._draw_tile()
-        self.hints[self.cur_player][action.targetTile] = [[True] * Game.N_RANKS, [True] * Game.N_SUITS]
+        self.hands[self.cur_player][action.target_tile] = self._draw_tile()
+        self.hints[self.cur_player][action.target_tile] = [[True] * Game.N_RANKS, [True] * Game.N_SUITS]
 
         if tile.rank == self.fireworks[tile.suit]:
             # correct tile placement: add to firework pile
@@ -174,12 +179,12 @@ class Game(object):
             self.n_fuse_tokens -= 1
 
     def _process_discard(self, action):
-        tile = self.hands[self.cur_player][action.targetTile]
+        tile = self.hands[self.cur_player][action.target_tile]
         # discard the tile
         self.n_tiles_per_type[tile.id] -= 1
         # draw new tile and init its hint
-        self.hands[self.cur_player][action.targetTile] = self._draw_tile()
-        self.hints[self.cur_player][action.targetTile] = [[True] * Game.N_RANKS, [True] * Game.N_SUITS]
+        self.hands[self.cur_player][action.target_tile] = self._draw_tile()
+        self.hints[self.cur_player][action.target_tile] = [[True] * Game.N_RANKS, [True] * Game.N_SUITS]
         # gain a new hint
         self.n_hint_tokens = min(Game.MAX_HINTS, self.n_hint_tokens + 1)
 
@@ -187,10 +192,10 @@ class Game(object):
         # remove a hint token
         self.n_hint_tokens -= 1
         # get target player and attribute
-        player = (self.cur_player + action.targetPlayer) % self.n_players
-        attribute = action.hintAttribute
+        player = (self.cur_player + action.target_player) % self.n_players
+        attribute = action.hint_attribute
 
-        if action.hintIsColor:
+        if action.hint_is_color:
             for i in range(self.hand_size):
                 match = self.hands[player][i].suit == attribute
                 tile_hint = self.hints[player][i][1]
