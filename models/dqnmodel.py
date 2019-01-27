@@ -138,7 +138,9 @@ class Model(object):
 
         # ---------------------------------
         # Initialize graph
-        self.sess = tf.Session(graph=self.graph)
+        sess_config = tf.ConfigProto()
+        sess_config.gpu_options.allow_growth = True  # not allow tf to use up all GPU memory, in case of sharing
+        self.sess = tf.Session(graph=self.graph, config=sess_config)
         with tf.Session() as temp_sess:
             temp_sess.run(tf.global_variables_initializer())
         self.sess.run(tf.variables_initializer(self.graph.get_collection('variables')))
