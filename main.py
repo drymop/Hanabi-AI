@@ -13,6 +13,8 @@ if __name__ == '__main__':
     model_configs = AttributeDict(
         n_rnn_hiddens=64,
         n_rnn_layers=2,
+        n_dense_before_rnn=3,
+        n_dense_after_rnn=3,
         n_outputs=Game.ACTIONS_PER_N_PLAYERS[n_players],
         learn_rate=1e-5,
     )
@@ -25,7 +27,7 @@ if __name__ == '__main__':
         time_steps=32,
         n_epochs_per_iter=64,
         explore_rate=(1, 0.15, 0.01),
-        discount_rate=0.95,
+        discount_rate=0.97,
     )
     trainer = Trainer(game_configs, model_configs, train_configs)
     trainer.start_training()

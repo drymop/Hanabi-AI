@@ -19,6 +19,8 @@ class Model(object):
         # model configs
         n_rnn_hiddens = model_configs.n_rnn_hiddens
         n_rnn_layers = model_configs.n_rnn_layers
+        n_dense_after_rnn = model_configs.n_dense_after_rnn
+        n_dense_before_rnn = model_configs.n_dense_before_rnn
         n_outputs = model_configs.n_outputs
         learn_rate = model_configs.learn_rate
         # game configs
@@ -88,18 +90,21 @@ class Model(object):
             # one hot vector for last action
             one_hot_last_actions = tf.one_hot(self.inputs.game_state.last_action, n_outputs - 1)
 
+
             # Processed input concat into a 2D array (batch_size x num_features)
             concated_inputs = tf.concat(
                 [one_hot_cur_player, remain_tiles, hands_hints, one_hot_fireworks, n_hint_tokens, n_fuse_tokens,
                  one_hot_last_actions], axis=-1)
 
-            # compress the sparse input through a dense layer
-            rnn_inputs = tf.layers.dense(concated_inputs, n_rnn_hiddens * 2, activation=tf.nn.sigmoid)
-            rnn_inputs = tf.layers.dense(rnn_inputs, n_rnn_hiddens, activation=tf.nn.sigmoid)
+            # -------------------------
+            # compress the sparse input through dense layers
+            layer = concated_inputs
+            for i in range(n_dense_before_rnn-1):
+                layer = tf.layers.dense(layer, 128, activation=tf.nn.sigmoid)
+            rnn_inputs = tf.layers.dense(layer, n_rnn_hiddens, activation=tf.nn.sigmoid)
 
             # -------------------------
             # Recurrent layer
-
             rnn_single_cell = tf.nn.rnn_cell.LSTMCell(n_rnn_hiddens, forget_bias=1.0, activation=tf.nn.sigmoid,
                                                       state_is_tuple=True)
             self.rnn_cell = tf.nn.rnn_cell.MultiRNNCell([rnn_single_cell] * n_rnn_layers, state_is_tuple=True)
@@ -109,7 +114,13 @@ class Model(object):
 
             rnn_outputs, self.rnn_state = tf.nn.dynamic_rnn(self.rnn_cell, rnn_inputs,
                                                             initial_state=initial_state_tuple)
-            dense = tf.layers.dense(rnn_outputs, n_outputs, activation=tf.nn.sigmoid)
+
+            # -------------------------
+            # Compress rnn output through multiple dense layer to get the final result
+            layer = rnn_outputs
+            for i in range(n_dense_after_rnn-1):
+                layer = tf.layers.dense(layer, 64, activation=tf.nn.sigmoid)
+            dense = tf.layers.dense(layer, n_outputs, activation=tf.nn.sigmoid)
             self.outputs = tf.multiply(dense, self.inputs.game_state.valid_mask)
 
             # -------------------------
