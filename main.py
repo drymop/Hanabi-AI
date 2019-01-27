@@ -12,7 +12,7 @@ if __name__ == '__main__':
     )
     model_configs = AttributeDict(
         n_rnn_hiddens=64,
-        n_rnn_layers=2,
+        n_rnn_layers=3,
         n_dense_before_rnn=3,
         n_dense_after_rnn=3,
         n_outputs=Game.ACTIONS_PER_N_PLAYERS[n_players],
