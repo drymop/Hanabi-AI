@@ -2,17 +2,15 @@ from collections import namedtuple
 import os
 import tensorflow as tf
 
-from utils.attributedict import AttributeDict
-
 
 class Model(object):
     """DQN model that takes in a sequence of Hanabi game states and output the Q value of each action"""
 
     # STATE_FEATURES = ['cur_player', 'remain_tiles', 'hands', 'hints',
-    #                   'hint_tokens', 'fuse_tokens', 'fire_work', 'last_action', 'valid_mask']
+    #                   'n_hint_tokens', 'n_fuse_tokens', 'fire_work', 'last_action', 'valid_mask']
 
-    StateFeatures = namedtuple(
-        'StateFeatures', 'cur_player remain_tiles hands hints hint_tokens fuse_tokens fireworks last_action valid_mask')
+    StateFeatures = namedtuple('StateFeatures', 'cur_player remain_tiles hands hints n_hint_tokens n_fuse_tokens '
+                                                'fireworks last_action valid_mask')
 
     def __init__(self, game_configs, model_configs):
         self.model_configs = model_configs
@@ -43,8 +41,8 @@ class Model(object):
                         hands=tf.placeholder(tf.int32, shape=[None, None, n_players - 1, hand_size], name='hands'),
                         hints=tf.placeholder(tf.float32, shape=[None, None, n_players, hand_size, n_tile_types],
                                              name='hints'),
-                        hint_tokens=tf.placeholder(tf.float32, shape=[None, None], name='hint_tokens'),
-                        fuse_tokens=tf.placeholder(tf.float32, shape=[None, None], name='fuse_tokens'),
+                        n_hint_tokens=tf.placeholder(tf.float32, shape=[None, None], name='n_hint_tokens'),
+                        n_fuse_tokens=tf.placeholder(tf.float32, shape=[None, None], name='n_fuse_tokens'),
                         fireworks=tf.placeholder(tf.int32, shape=[None, None, n_suits], name='fireworks'),
                         valid_mask=tf.placeholder(tf.float32, shape=[None, None, n_outputs], name='valid_mask'),
                         last_action=tf.placeholder(tf.int32, shape=[None, None], name='last_action'),
@@ -77,12 +75,12 @@ class Model(object):
 
             # normalize integral quantities into (0, 1) range
             # remain_tiles = tf.scalar_mul(tf.constant(1/MAX_N_PER_TYPES), remain_tiles)
-            # hint_tokens  = tf.scalar_mul(tf.constant(1/MAX_HINT_TOKENS), self.inputs.game_state.hint_tokens)
-            # fuse_tokens  = tf.scalar_mul(tf.constant(1/MAX_FUSE_TOKENS), self.inputs.game_state.fuse_tokens)
+            # n_hint_tokens  = tf.scalar_mul(tf.constant(1/MAX_HINT_TOKENS), self.inputs.game_state.n_hint_tokens)
+            # n_fuse_tokens  = tf.scalar_mul(tf.constant(1/MAX_FUSE_TOKENS), self.inputs.game_state.n_fuse_tokens)
 
-            # reshape hint_tokens and fuse_tokens from float to array of 1 element
-            hint_tokens = tf.reshape(self.inputs.game_state.hint_tokens, [batch_size, time_steps, 1])
-            fuse_tokens = tf.reshape(self.inputs.game_state.fuse_tokens, [batch_size, time_steps, 1])
+            # reshape n_hint_tokens and n_fuse_tokens from float to array of 1 element
+            n_hint_tokens = tf.reshape(self.inputs.game_state.n_hint_tokens, [batch_size, time_steps, 1])
+            n_fuse_tokens = tf.reshape(self.inputs.game_state.n_fuse_tokens, [batch_size, time_steps, 1])
             # shape: [batch_size, time_steps, n_ranks, n_suits]
             one_hot_fireworks = tf.one_hot(self.inputs.game_state.fireworks, n_ranks, axis=2)
             one_hot_fireworks = tf.reshape(one_hot_fireworks, [batch_size, time_steps, n_tile_types])
@@ -92,7 +90,7 @@ class Model(object):
 
             # Processed input concat into a 2D array (batch_size x num_features)
             concated_inputs = tf.concat(
-                [one_hot_cur_player, remain_tiles, hands_hints, one_hot_fireworks, hint_tokens, fuse_tokens,
+                [one_hot_cur_player, remain_tiles, hands_hints, one_hot_fireworks, n_hint_tokens, n_fuse_tokens,
                  one_hot_last_actions], axis=-1)
 
             # compress the sparse input through a dense layer
@@ -175,20 +173,3 @@ class Model(object):
             raise FileNotFoundError('No model in path {}'.format(file_path))
         with self.graph.as_default():
             self.saver.restore(self.sess, file_path)
-
-if __name__ == '__main__':
-    n_players = 3
-    game_configs = AttributeDict(
-        n_players=n_players,
-        n_ranks=5,
-        n_suits=5,
-        hand_size=5,
-    )
-    model_configs = AttributeDict(
-        n_rnn_hiddens=64,
-        n_rnn_layers=2,
-        n_outputs=31,
-        learn_rate=1e-5,
-    )
-    m = Model(game_configs, model_configs)
-

@@ -3,10 +3,10 @@ import json
 import numpy as np
 import os
 import random
+import time
 
 from game import Game
 from models.dqnmodel import Model
-from utils.attributedict import AttributeDict
 from utils.expbuffer import Experience, ExperienceBuffer
 
 
@@ -94,8 +94,8 @@ class Trainer:
                 remain_tiles=remain_tiles,
                 hands=[all_hands[i % n_players] for i in range(p + 1, p + n_players)],
                 hints=[all_hints[i % n_players] for i in range(p, p + n_players)],
-                hint_tokens=game.n_hint_tokens,
-                fuse_tokens=game.n_fuse_tokens,
+                n_hint_tokens=game.n_hint_tokens,
+                n_fuse_tokens=game.n_fuse_tokens,
                 fireworks=fireworks,
                 last_action=last_action,
                 valid_mask=valid_mask_cur_player if p == game.cur_player else valid_mask_other_player,
@@ -248,7 +248,6 @@ class Trainer:
             q_values = np.delete(q_values, -1, axis=1)
             loss = self.train_model.train(Trainer.format_batch(batch),
                                           self.rnn_zero_state_batch, q_values, self.loss_mask_batch_all)
-            print(loss)
             avg_loss += loss
         return avg_loss / n_epochs
 
@@ -265,7 +264,7 @@ class Trainer:
         # file recording statistics during training
         with open(stats_file_path, 'a+') as stats_file:
             stats_file.write('iter, explore_rate, buffer_eval, sample_score, sample_eval, sample_deaths, '
-                             'sample_turns, valid_score, valid_eval, valid_deaths, valid_turns, loss\n')
+                             'sample_turns, valid_score, valid_eval, valid_deaths, valid_turns, loss, time\n')
 
         # file saving the configs
         with open(os.path.join(save_folder, 'configs.json'), 'w+') as configs_file:
@@ -312,6 +311,7 @@ class Trainer:
         n_validation_games = self.train_configs.n_validation_games_per_iter
         # do iterations 0 -> infinity
         for it in itertools.count():
+            start_iter_time = time.time()
             print('===================================== ITER {} ========================================='.format(it))
             print('explore rate: {}'.format(explore_rate))
 
@@ -329,7 +329,7 @@ class Trainer:
             sample_deaths = sum(Game.MAX_FUSES - game.n_fuse_tokens for game in games) / n_sample_games
             sample_turns = sum(game.n_turns for game in games) / n_sample_games
             print('\n{} sample games played'.format(n_sample_games))
-            print('buffer score: {}\nsample score: {}\nsample eval: {}\nsample deaths: {}\nsample turns: {}'
+            print('buffer eval: {}\nsample score: {}\nsample eval: {}\nsample deaths: {}\nsample turns: {}'
                   .format(self.experience_buffer.avgScore, sample_score, sample_eval, sample_deaths,
                           sample_turns))
 
@@ -348,12 +348,14 @@ class Trainer:
             loss = self.train(it, self.train_configs.n_epochs_per_iter)
             print('\nloss: {}'.format(loss))
 
+            iter_total_time = time.time() - start_iter_time
+            print('time: {}'.format(iter_total_time))
             # log stuff to stat file
             with open(stats_file_path, 'a+') as stats_file:
                 stats = [it, explore_rate, self.experience_buffer.avgScore,
                          sample_score, sample_eval, sample_deaths, sample_turns,
                          valid_score, valid_eval, valid_deaths, valid_turns,
-                         loss]
+                         loss, iter_total_time]
                 stats_file.write(','.join(map(str, stats)))
                 stats_file.write('\n')
 
