@@ -1,12 +1,12 @@
+import itertools
+import json
 import numpy as np
 import os
 import random
-from pprint import pprint as pp
 
 from game import Game
 from models.dqnmodel import Model
-from utils.attributedict import AttributeDict as attdict
-from utils.consoledisplay import display_state, display_action
+from utils.attributedict import AttributeDict
 from utils.expbuffer import Experience, ExperienceBuffer
 
 
@@ -25,22 +25,28 @@ class Trainer:
         n_rnn_hiddens = model_configs.n_rnn_hiddens
 
         batch_size = train_configs.batch_size
+        time_steps = train_configs.time_steps
 
         # -------------------------
         # models to train and experience buffer
 
-        self.train_model = Model(model_configs, game_configs)
-        self.targetModel = Model(model_configs, game_configs)
+        self.train_model = Model(game_configs, model_configs)
+        # model used during training iteration while train_model is being updated
+        self.target_model = Model(game_configs, model_configs)
+
         self.buffer_size = 32768  # 2^15
         self.experience_buffer = ExperienceBuffer(self.buffer_size)
 
         # -------------------------
         # Precomputed neural network's inputs
 
-        # various valid_mask for a game state
+        # various valid masks for a game state
         self.valid_mask_none = np.zeros(n_actions)  # none of the actions are valid
         self.valid_mask_do_nothing = np.zeros(n_actions)  # only the last action is valid (do nothing)
         self.valid_mask_do_nothing[-1] = 1
+
+        # loss masks
+        self.loss_mask_batch_all = np.ones(shape=(batch_size, time_steps, n_actions))
 
         # rnn zero state for a batch
         self.rnn_zero_state_batch = np.zeros((n_rnn_layers, 2, batch_size, n_rnn_hiddens))
@@ -51,7 +57,7 @@ class Trainer:
         fuse_value = 0.5
         fuse_value_increase = 0.2
         self.fuse_eval = [0, fuse_value]
-        for i in range(50):
+        for i in range(Game.MAX_FUSES - 2):
             fuse_value += fuse_value_increase
             self.fuse_eval.append(self.fuse_eval[-1] + fuse_value)
 
@@ -84,7 +90,7 @@ class Trainer:
         game_states = [None] * n_players
         for p in range(n_players):
             game_states[p] = Model.StateFeatures(
-                cur_player=(p - game.cur_player) % n_players,
+                cur_player=(game.cur_player - p) % n_players,
                 remain_tiles=remain_tiles,
                 hands=[all_hands[i % n_players] for i in range(p + 1, p + n_players)],
                 hints=[all_hints[i % n_players] for i in range(p, p + n_players)],
@@ -108,73 +114,13 @@ class Trainer:
             batch[i] = series[r:r + time_steps + 1]
         return batch
 
-    # def play(self, game, minLength, explore_rate=0.1, show=False):
-    #     # 2d array of state, recording the time series of each player
-    #     timeSeries = [[] for _ in range(game.n_players)]
-    #
-    #     rnnStateTuple = self.gameZeroState
-    #     score = self.eval_game(game)
-    #     while not game.is_over:
-    #
-    #         game_states = self.extract_game_state(game)
-    #         for player in range(game.n_players):
-    #             timeSeries[player].append(game_states[player])
-    #
-    #         x = Trainer.formatBatch([s] for s in game_states)
-    #
-    #         batchQValues, rnnStateTuple = self.train_model.predict(x, rnnStateTuple)
-    #
-    #         # get the q-prediction of the current player at the only time step
-    #         qValues = batchQValues[game.curPlayer][-1]
-    #
-    #         validActions = game.getValidActions()
-    #
-    #         if random.random() > explore_rate:
-    #             # choose action with max q value
-    #             m = max(qValues[i] for i in range(len(qValues)) if validActions[i])
-    #             choices = [i for i in range(len(qValues)) if qValues[i] == m]
-    #         else:
-    #             # choose action randomly
-    #             choices = [i for i, b in enumerate(validActions) if b]
-    #         actionInd = random.choice(choices)
-    #         action = game.actions[actionInd]
-    #
-    #         # save the action
-    #         game_states[game.curPlayer].action_and_reward[0] = actionInd
-    #
-    #         if show:
-    #             display_state(game, firstPerson=False)
-    #             pp(batchQValues)
-    #
-    #             print('\nAction: {}'.format(actionInd))
-    #             display_action(game, action)
-    #             print()
-    #             input('Press ENTER...')
-    #
-    #         game.play(action)
-    #
-    #         # get reward
-    #         newScore = self.eval_game(game)
-    #         for state in game_states:
-    #             state.action_and_reward[1] = newScore - score
-    #         score = newScore
-    #
-    #     if show:
-    #         display_state(game, False)
-    #         print(game.score, end=" ")
-    #         print(game.nFuseTokens)
-    #
-    #     # Add the terminal state, as well as pad to minimum required length
-    #     nTurn = len(timeSeries[0])
-    #     pad = max(0, minLength - nTurn) + 1
-    #     terminalStates = self.extract_game_state(game)
-    #     for _ in range(pad):
-    #         for player in range(game.n_players):
-    #             timeSeries[player].append(terminalStates[player])
-    #
-    #     return score, nTurn, timeSeries
-
     def play_batch(self, n_games, explore_rate=0.1):
+        """
+        Play a batch of games using the train_model neural network to select move
+        :param n_games: number of games
+        :param explore_rate: probability that a move is chosen randomly (instead of choosing the best move)
+        :return: list of games played and list of time series
+        """
         n_players = self.game_configs.n_players
         time_steps = self.train_configs.time_steps
         batch_size = n_games * n_players
@@ -183,7 +129,7 @@ class Trainer:
         # (aka the time series of player j of game i is stored at index (i*n_players + j)
         time_series = [[] for _ in range(batch_size)]
         games = [Game(n_players) for _ in range(n_games)]
-        rnn_state = np.zeros((self.model_configs.n_rnn_layers, 2, batch_size, self.model_configs.n_hiddens))
+        rnn_state = np.zeros((self.model_configs.n_rnn_layers, 2, batch_size, self.model_configs.n_rnn_hiddens))
         last_actions = [-1] * n_games
 
         while not all(g.is_over for g in games):
@@ -197,7 +143,7 @@ class Trainer:
 
             # use NN to figure out next move for each game
             cur_game_states = [[ts[-1]] for ts in time_series]  # shape=(batch_size, time_step=1)
-            nn_inputs = Trainer.formatBatch(cur_game_states)
+            nn_inputs = Trainer.format_batch(cur_game_states)
             batch_q, rnn_state = self.train_model.predict(nn_inputs, rnn_state)
 
             # choose action for each game based on Q values
@@ -216,8 +162,7 @@ class Trainer:
                 action = game.actions[action_id]
                 game.play(action)
 
-                for j in range(i * n_players, (i + 1) * n_players):
-                    last_actions[j] = action_id
+                last_actions[i] = action_id
 
         # Add the terminal state, as well as pad to minimum required length for each time series
         for i, game in enumerate(games):
@@ -261,217 +206,174 @@ class Trainer:
 
         return game, time_series
 
-    # def train(self, iteration, epoch, checkpoint_folder='save', discount_rate=0.99):
-    #     saveFile = Trainer.checkpointFile(iteration)
-    #     self.train_model.save_checkpoint(folder=checkpoint_folder, filename=saveFile)
-    #     self.targetModel.load_checkpoint(folder=checkpoint_folder, filename=saveFile)
-    #
-    #     # train for some epochs
-    #     avgLoss = 0
-    #     for epochI in range(epoch):
-    #         # print('EPOCH ::: ' + str(epochI + 1))
-    #
-    #         # get experiences
-    #         batch = self.get_train_batch(self.batch_size, self.time_steps)
-    #
-    #         # Q value for such experience
-    #         targetQ, _ = self.targetModel.predict(Trainer.formatBatch(batch), self.batchZeroState)
-    #
-    #         # train against the target
-    #         for i in range(self.batch_size):
-    #             for j in range(self.time_steps):
-    #                 actionTaken, reward = batch[i][j].action_and_reward
-    #                 targetQ[i][j][actionTaken] = reward + discount_rate * max(targetQ[i][j + 1])
-    #
-    #         # remove the last time step
-    #         for series in batch:
-    #             series.pop()
-    #         targetQ = np.delete(targetQ, -1, 1)
-    #         t = Trainer.formatBatch(batch)
-    #
-    #         loss = self.train_model.train(Trainer.formatBatch(batch), self.batchZeroState, targetQ)
-    #         print(loss)
-    #         avgLoss += loss
-    #     return avgLoss / epoch
-    #
-    # def start(self, startIteration=0, startExploreRate=1, endExploreRate=0.05, exploreDecrease=0.015):
-    #     # fill up the buffer
-    #     print('==================================== FILLING BUFFER ===================================')
-    #     avgScore = 0
-    #     avgTurn = 0
-    #     # n_random_games = self.buffer_size//self.n_players//2
-    #     n_random_games = 1
-    #     i = 0
-    #     while i < n_random_games:
-    #         game = Game(self.n_players)
-    #         score, nTurn, timeSeries = self.play_random(game, self.time_steps)
-    #
-    #         i += 1
-    #         for s in timeSeries:
-    #             self.experience_buffer.add(Experience(score, s), weighted=True)
-    #         avgScore += score
-    #         avgTurn += nTurn
-    #         if (i % 200) == 0:
-    #             print('{} games played'.format(i))
-    #             print('buffer score: {}'.format(self.experience_buffer.avgScore))
-    #             print('score: {}'.format(avgScore / i))
-    #             print('turn : {}'.format(avgTurn / i))
-    #     print('score: {}'.format(avgScore / n_random_games))
-    #     print('turn : {}'.format(avgTurn / n_random_games))
-    #
-    #     explore_rate = max(startExploreRate - (startIteration - 1) * exploreDecrease, endExploreRate)
-    #
-    #     # create folder and files for recording train progress
-    #     save_folder = 'save'
-    #     stats_file_name = 'save/stats.csv'
-    #     if not os.path.exists(save_folder):
-    #         print("Save directory does not exist! Making directory {}".format(save_folder))
-    #         os.mkdir(save_folder)
-    #
-    #     with open(stats_file_name, 'a+') as stats_file:
-    #         stats_file.write(
-    #             'iter, explore_rate, buffer_score, sample_discarded, sample_score, sample_game_score, sample_deaths, sample_turns, validation_score, validation_game_score, validation_deaths, validation_turns, loss\n')
-    #
-    #     # start training
-    #     for it in range(startIteration, 100000 + startIteration):
-    #         print('========================================= ITER {} ==================================='.format(it))
-    #         print('explore rate: {}'.format(explore_rate))
-    #
-    #         # create sample games by playing with exploration on
-    #         sample_discarded = 0
-    #         sample_score = 0
-    #         sample_game_score = 0
-    #         sample_deaths = 0
-    #         sample_turns = 0
-    #         sample_games = 500
-    #         i = 0
-    #         while i < sample_games:
-    #             game = Game(self.n_players)
-    #             score, nTurn, timeSeries = self.play(game, self.time_steps, explore_rate=explore_rate)
-    #             if game.score <= 0:
-    #                 sample_discarded += 1
-    #                 continue
-    #             for s in timeSeries:
-    #                 self.experience_buffer.add(Experience(score, s), weighted=True)
-    #             sample_score += score
-    #             sample_game_score += game.score
-    #             sample_deaths += Game.MAX_FUSES - game.n_fuse_tokens
-    #             sample_turns += nTurn
-    #             if (i % 100) == 0:
-    #                 print('{} sample games played, discarded {}'.format(i, sample_discarded))
-    #             i += 1
-    #
-    #         sample_score /= sample_games
-    #         sample_game_score /= sample_games
-    #         sample_deaths /= sample_games
-    #         sample_turns /= sample_games
-    #
-    #         print('buffer score: {}\nsample score: {}\nsample game score: {}\nsample deaths: {}\nsample turns: {}'
-    #               .format(self.experience_buffer.avgScore, sample_score, sample_game_score, sample_deaths,
-    #                       sample_turns))
-    #
-    #         # create validation games by playing with exploration off
-    #         valid_score = 0
-    #         valid_game_score = 0
-    #         valid_deaths = 0
-    #         valid_turns = 0
-    #         valid_games = 50
-    #         i = 0
-    #         while i < valid_games:
-    #             game = Game(self.n_players)
-    #             score, nTurn, timeSeries = self.play(game, self.time_steps, explore_rate=0)
-    #             valid_score += score
-    #             valid_game_score += game.score
-    #             valid_deaths += Game.MAX_FUSES - game.n_fuse_tokens
-    #             valid_turns += nTurn
-    #             i += 1
-    #         print('{} validation games played'.format(i))
-    #
-    #         valid_score /= valid_games
-    #         valid_game_score /= valid_games
-    #         valid_deaths /= valid_games
-    #         valid_turns /= valid_games
-    #
-    #         print('\nvalid score: {}\nvalid game score: {}\nvalid deaths: {}\nvalid turns: {}'
-    #               .format(valid_score, valid_game_score, valid_deaths, valid_turns))
-    #
-    #         # train
-    #         loss = self.train(it, 100, checkpoint_folder=save_folder)
-    #         print('loss: {}'.format(loss))
-    #
-    #         # log stuff to stat file
-    #         with open(stats_file_name, 'a+') as stats_file:
-    #             stats = [it, explore_rate, self.experience_buffer.avgScore,
-    #                      sample_discarded, sample_score, sample_game_score, sample_deaths, sample_turns,
-    #                      valid_score, valid_game_score, valid_deaths, valid_turns,
-    #                      loss]
-    #             stats_file.write(','.join(map(str, stats)))
-    #             stats_file.write('\n')
-    #
-    #         # update iteration related variables
-    #         explore_rate = max(explore_rate - exploreDecrease, endExploreRate)
+    def train(self, iteration, n_epochs):
+        save_file = Trainer.checkpoint_file_name(iteration)
+        save_folder = self.train_configs.save_folder
+        self.train_model.save_checkpoint(folder=save_folder, filename=save_file)
+        self.target_model.load_checkpoint(folder=save_folder, filename=save_file)
 
-    def eval_game(self, game):
-        return sum(self.firework_eval[x] for x in game.fireworks) - self.fuse_eval[Game.MAX_FUSES - game.n_fuse_tokens]
+        batch_size = self.train_configs.batch_size
+        time_steps = self.train_configs.time_steps
+        discount_rate = self.train_configs.discount_rate
+
+        # train for some epochs
+        avg_loss = 0
+        for epoch in range(n_epochs):
+            # get experiences
+            batch = self.get_train_batch(batch_size, time_steps)  # each feature has shape [batch_size, time_steps+1, ?]
+
+            # reward from time i to i+1:
+            batch_rewards = []
+            for time_series in batch:
+                series_rewards = [None] * time_steps
+                cur_eval = self.eval_game_state(time_series[0])
+                for i in range(time_steps):
+                    next_eval = self.eval_game_state(time_series[i + 1])
+                    series_rewards[i] = next_eval - cur_eval
+                    cur_eval = next_eval
+                batch_rewards.append(series_rewards)
+
+            # Q values for each game state from the batch, shape=(batch_size, time_steps+1, n_actions)
+            q_values, _ = self.target_model.predict(Trainer.format_batch(batch), self.rnn_zero_state_batch)
+
+            # target Q values = reward + max(Q values of next state)
+            for i in range(batch_size):
+                for j in range(time_steps):
+                    action, reward = batch[i][j + 1].last_action, batch_rewards[i][j]
+                    q_values[i][j][action] = reward + discount_rate * max(q_values[i][j + 1])
+
+            # remove the last time step
+            for series in batch:
+                series.pop()
+            q_values = np.delete(q_values, -1, axis=1)
+            loss = self.train_model.train(Trainer.format_batch(batch),
+                                          self.rnn_zero_state_batch, q_values, self.loss_mask_batch_all)
+            print(loss)
+            avg_loss += loss
+        return avg_loss / n_epochs
+
+    def start_training(self):
+        # -------------------------
+        # create folder and files for recording train progress
+        save_folder = self.train_configs.save_folder
+        stats_file_path = os.path.join(save_folder, 'stats.csv')
+
+        if not os.path.exists(save_folder):
+            print("Save directory does not exist! Making directory {}".format(save_folder))
+            os.mkdir(save_folder)
+
+        # file recording statistics during training
+        with open(stats_file_path, 'a+') as stats_file:
+            stats_file.write('iter, explore_rate, buffer_eval, sample_score, sample_eval, sample_deaths, '
+                             'sample_turns, valid_score, valid_eval, valid_deaths, valid_turns, loss\n')
+
+        # file saving the configs
+        with open(os.path.join(save_folder, 'configs.json'), 'w+') as configs_file:
+            json.dump(dict(game_configs=self.game_configs,
+                           model_configs=self.model_configs,
+                           train_configs=self.train_configs),
+                      configs_file)
+
+        # -------------------------
+        # fill up the buffer
+        print('==================================== FILLING BUFFER ===================================')
+        avg_score = 0
+        avg_eval = 0
+        avg_turns = 0
+        n_random_games = self.buffer_size // self.game_configs.n_players // 2  # fill half of the buffer
+
+        for i in range(n_random_games):
+            game, time_series = self.play_random()
+            # add to buffer
+            _eval = self.eval_game_state(time_series[0][-1])  # evaluation of the final state
+            for time_series_a_player in time_series:
+                self.experience_buffer.add(Experience(_eval, time_series_a_player), weighted=True)
+            # update average
+            avg_score += game.score
+            avg_eval += _eval
+            avg_turns += game.n_turns
+            if ((i + 1) % 200) == 0:
+                games_played = i + 1
+                print('{} games played'.format(games_played))
+                print('buffer eval: {}'.format(self.experience_buffer.avgScore))
+                print('score: {}'.format(avg_score / games_played))
+                print('eval : {}'.format(avg_eval / games_played))
+                print('turn : {}'.format(avg_turns / games_played))
+        print('score: {}'.format(avg_score / n_random_games))
+        print('eval : {}'.format(avg_eval / n_random_games))
+        print('turn : {}'.format(avg_turns / n_random_games))
+
+        # -------------------------
+        # start training
+
+        explore_rate_start, explore_rate_end, explore_rate_decrease = self.train_configs.explore_rate
+        explore_rate = explore_rate_start
+        n_sample_games = self.train_configs.n_games_per_iter
+        n_validation_games = self.train_configs.n_validation_games_per_iter
+        # do iterations 0 -> infinity
+        for it in itertools.count():
+            print('===================================== ITER {} ========================================='.format(it))
+            print('explore rate: {}'.format(explore_rate))
+
+            # create sample games by playing with exploration on
+            games, batch_time_series = self.play_batch(n_sample_games, explore_rate=explore_rate)
+            # add sample games to experience buffer
+            sample_eval = 0
+            for time_series in batch_time_series:
+                _eval = self.eval_game_state(time_series[-1])
+                sample_eval += _eval
+                self.experience_buffer.add(Experience(_eval, time_series), weighted=True)
+            # print statistics
+            sample_score = sum(game.score for game in games) / n_sample_games
+            sample_eval = sample_eval / len(batch_time_series)
+            sample_deaths = sum(Game.MAX_FUSES - game.n_fuse_tokens for game in games) / n_sample_games
+            sample_turns = sum(game.n_turns for game in games) / n_sample_games
+            print('\n{} sample games played'.format(n_sample_games))
+            print('buffer score: {}\nsample score: {}\nsample eval: {}\nsample deaths: {}\nsample turns: {}'
+                  .format(self.experience_buffer.avgScore, sample_score, sample_eval, sample_deaths,
+                          sample_turns))
+
+            # create validation games by playing with exploration off, these games are not added to experience buffer
+            games, batch_time_series = self.play_batch(n_validation_games, explore_rate=0)
+            # print statistics
+            valid_score = sum(game.score for game in games) / n_validation_games
+            valid_eval = sum(self.eval_game_state(ts[-1]) for ts in batch_time_series) / len(batch_time_series)
+            valid_deaths = sum(Game.MAX_FUSES - game.n_fuse_tokens for game in games) / n_validation_games
+            valid_turns = sum(game.n_turns for game in games) / n_validation_games
+            print('\n{} validation games played'.format(n_validation_games))
+            print('valid score: {}\nvalid eval: {}\nvalid deaths: {}\nvalid turns: {}'
+                  .format(valid_score, valid_eval, valid_deaths, valid_turns))
+
+            # train
+            loss = self.train(it, self.train_configs.n_epochs_per_iter)
+            print('\nloss: {}'.format(loss))
+
+            # log stuff to stat file
+            with open(stats_file_path, 'a+') as stats_file:
+                stats = [it, explore_rate, self.experience_buffer.avgScore,
+                         sample_score, sample_eval, sample_deaths, sample_turns,
+                         valid_score, valid_eval, valid_deaths, valid_turns,
+                         loss]
+                stats_file.write(','.join(map(str, stats)))
+                stats_file.write('\n')
+
+            # update iteration related variables
+            explore_rate = max(explore_rate - explore_rate_decrease, explore_rate_end)
+
+    def eval_game_state(self, game_state):
+        return sum(self.firework_eval[x] for x in game_state.fireworks) \
+               - self.fuse_eval[Game.MAX_FUSES - game_state.n_fuse_tokens]
 
     @staticmethod
-    def checkpointFile(iteration):
-        return 'checkpoint' + str(iteration) + '.ckpt'
+    def checkpoint_file_name(iteration):
+        return str(iteration) + '.ckpt'
 
     @staticmethod
-    def formatBatch(timeSeriesList):
-        '''
+    def format_batch(time_series_batch):
+        """
         Create a batch from a list of time series, each time series is a list of States
-        aka a 2D array of State, shape [batch_size x time_steps]
-        The resulting batch has each field be a 2D array of shape [batch_size x time_steps],
-        where element[i][j] is the value of the field of State at [i][j]
-        '''
-        return GameState(*zip(*(zip(*s) for s in timeSeriesList)))
-
-
-# def main():
-#     nHiddens = 64
-#     batch_size = 128
-#     time_steps = 32
-#     n_players = 3
-#     learn_rate = 1e-5
-#
-#     trainer = Trainer(3, nHiddens, 2, learn_rate, batch_size, time_steps)
-#
-#     load_folder = 'save'
-#     loadIter = 0
-#     if loadIter > 0:
-#         trainer.train_model.load_checkpoint(folder=load_folder, filename=Trainer.checkpointFile(loadIter))
-#
-#     # while True:
-#     #     game = Game(n_players)
-#     #     trainer.play(game, time_steps, explore_rate=0, show=True)
-#     #     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-#     #     input()
-#
-#     trainer.start(startIteration=loadIter + 1, startExploreRate=0.8, endExploreRate=0.2, exploreDecrease=0.01)
-
-def main():
-    n_players = 3
-    game_configs = attdict(
-        n_players=n_players,
-        n_ranks=Game.N_RANKS,
-        n_suits=Game.N_SUITS,
-        hand_size=Game.HAND_SIZE_PER_N_PLAYERS[n_players],
-    )
-    model_configs = attdict(
-        n_rnn_hiddens=64,
-        n_rnn_layers=2,
-        n_outputs=Game.ACTIONS_PER_N_PLAYERS[n_players],
-        learn_rate=1e-5,
-    )
-    train_configs = attdict(
-        batch_size=128,
-        time_steps=32,
-    )
-
-    trainer = Trainer(game_configs, model_configs, train_configs)
-
-
-if __name__ == '__main__':
-    main()
+        (aka a 2D array of game states, shape=[batch_size x time_steps])
+        The resulting batch collects each feature of game state in a 2D array of shape [batch_size x time_steps],
+        where element[i][j] is the feature of State at batch i, time j
+        """
+        return Model.StateFeatures(*zip(*(zip(*s) for s in time_series_batch)))

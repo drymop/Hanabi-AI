@@ -14,7 +14,7 @@ class Model(object):
     StateFeatures = namedtuple(
         'StateFeatures', 'cur_player remain_tiles hands hints hint_tokens fuse_tokens fireworks last_action valid_mask')
 
-    def __init__(self, model_configs, game_configs):
+    def __init__(self, game_configs, model_configs):
         self.model_configs = model_configs
         self.game_configs = game_configs
 
@@ -190,5 +190,5 @@ if __name__ == '__main__':
         n_outputs=31,
         learn_rate=1e-5,
     )
-    m = Model(model_configs, game_configs)
+    m = Model(game_configs, model_configs)
 

@@ -28,7 +28,7 @@ class Game(object):
     N_SUITS = len(SUITS)
     MAX_SCORE = N_SUITS * N_RANKS
     MAX_HINTS = 8
-    MAX_FUSES = 50
+    MAX_FUSES = 35
 
     # list of all unique tile types (= RANKS x SUITS)
     # to translate between tile type and tile index, the formula is

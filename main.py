@@ -1,71 +1,31 @@
 from game import Game
-from pprint import pprint
-from ConsoleDisplay import display
-from RandomPlayer import getAction
-import random
+from trainers.dqntrainer import Trainer
+from utils.attributedict import AttributeDict
 
-g = Game(3)
-
-PRINT_KEY = ['deck_size', 'hands', 'cur_player', 'hints', 'n_hint_tokens', 'fireworkPile', 'n_fuse_tokens', 'score']
-RANKS  = ('1', '2', '3', '4', '5')
-COLORS = ('B', 'G', 'R', 'W', 'Y')
-
-# def printAction(action, game):
-#   print(action.type, end = " ")
-#   if action.type == 'PLAY' or action.type == 'DISCARD':
-#     print((action.targetTile+1))
-#   elif action.type == 'HINT':
-#     print((action.targetPlayer+game.cur_player+1)%game.N_PLAYERS, end = " ")
-#     if action.hintIsColor:
-#       print(COLORS[action.hintAttribute])
-#     else:
-#       print(RANKS[action.hintAttribute])
-#   else:
-#     print()
-def printAction(action, game):
-  pprint(action.__dict__)
-
-
-
-def pp():
-  ndict = {k: g.__dict__[k] for k in PRINT_KEY}
-  pprint(ndict)
-
-def dd():
-  display(g)
-
-def pl(a):
-  g.play(a)
-  display(g)
-
-
-
-Action = type('',(),{})
-
-ha = Action()
-ha.type = "HINT"
-ha.targetPlayer = 1
-ha.hintAttribute = 0
-ha.hintIsColor = False
-
-pa = Action()
-pa.type = "PLAY"
-pa.targetTile = 0
-
-da = Action()
-da.type = "DISCARD"
-da.targetTile = 0
-
-while True:
-  g = Game(random.randint(2,5))
-  while not g.is_over():
-    dd()
-    a = getAction(g)
-    print()
-    printAction(a, g)
-    if (a.type == 'UNDO'):
-      g.undo()
-    else:
-      g.play(a)
-  dd()
-  input()
+if __name__ == '__main__':
+    n_players = 3
+    game_configs = AttributeDict(
+        n_players=n_players,
+        n_ranks=Game.N_RANKS,
+        n_suits=Game.N_SUITS,
+        hand_size=Game.HAND_SIZE_PER_N_PLAYERS[n_players],
+    )
+    model_configs = AttributeDict(
+        n_rnn_hiddens=64,
+        n_rnn_layers=2,
+        n_outputs=Game.ACTIONS_PER_N_PLAYERS[n_players],
+        learn_rate=1e-5,
+    )
+    train_configs = AttributeDict(
+        save_folder='save',
+        buffer_size=32768,  # 2^15
+        n_games_per_iter=1024,
+        n_validation_games_per_iter=128,
+        batch_size=128,
+        time_steps=32,
+        n_epochs_per_iter=64,
+        explore_rate=(1, 0.15, 0.01),
+        discount_rate=0.95,
+    )
+    trainer = Trainer(game_configs, model_configs, train_configs)
+    trainer.start_training()
