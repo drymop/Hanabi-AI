@@ -100,12 +100,12 @@ class Model(object):
             # compress the sparse input through dense layers
             layer = concated_inputs
             for i in range(n_dense_before_rnn-1):
-                layer = tf.layers.dense(layer, 128, activation=tf.nn.sigmoid)
-            rnn_inputs = tf.layers.dense(layer, n_rnn_hiddens, activation=tf.nn.sigmoid)
+                layer = tf.layers.dense(layer, 128, activation=tf.nn.leaky_relu)
+            rnn_inputs = tf.layers.dense(layer, n_rnn_hiddens, activation=tf.nn.leaky_relu)
 
             # -------------------------
             # Recurrent layer
-            rnn_single_cell = tf.nn.rnn_cell.LSTMCell(n_rnn_hiddens, forget_bias=1.0, activation=tf.nn.sigmoid,
+            rnn_single_cell = tf.nn.rnn_cell.LSTMCell(n_rnn_hiddens, forget_bias=1.0, activation=tf.nn.leaky_relu,
                                                       state_is_tuple=True)
             self.rnn_cell = tf.nn.rnn_cell.MultiRNNCell([rnn_single_cell] * n_rnn_layers, state_is_tuple=True)
 
@@ -119,8 +119,8 @@ class Model(object):
             # Compress rnn output through multiple dense layer to get the final result
             layer = rnn_outputs
             for i in range(n_dense_after_rnn-1):
-                layer = tf.layers.dense(layer, 64, activation=tf.nn.sigmoid)
-            dense = tf.layers.dense(layer, n_outputs, activation=tf.nn.sigmoid)
+                layer = tf.layers.dense(layer, 64, activation=tf.nn.leaky_relu)
+            dense = tf.layers.dense(layer, n_outputs)
             self.outputs = tf.multiply(dense, self.inputs.game_state.valid_mask)
 
             # -------------------------
