@@ -55,7 +55,7 @@ class Trainer:
         # Evaluation of game state
         self.firework_eval = np.array([0, 1, 2.2, 3.6, 5.3, 7.3])
         fuse_value = 0.5
-        fuse_value_increase = 0.2
+        fuse_value_increase = 0
         self.fuse_eval = [0, fuse_value]
         for i in range(Game.MAX_FUSES - 2):
             fuse_value += fuse_value_increase
