@@ -53,13 +53,19 @@ class Trainer:
 
         # -------------------------
         # Evaluation of game state
-        self.firework_eval = np.array([0, 1, 2.2, 3.6, 5.3, 7.3])
-        fuse_value = 0.5
-        fuse_value_increase = 0.2
-        self.fuse_eval = [0, fuse_value]
-        for i in range(Game.MAX_FUSES - 2):
-            fuse_value += fuse_value_increase
-            self.fuse_eval.append(self.fuse_eval[-1] + fuse_value)
+        firework_val, firework_inc = self.train_configs.firework_eval
+        self.firework_eval = [0, firework_val]
+        for i in range(Game.N_RANKS - 1):
+            firework_val += firework_inc
+            self.firework_eval.append(self.firework_eval[-1] + firework_val)
+        fuse_val, fuse_inc = self.train_configs.fuse_eval
+        self.fuse_eval = [0, fuse_val]
+        for i in range(Game.MAX_FUSES - 1):
+            fuse_val += fuse_inc
+            self.fuse_eval.append(self.fuse_eval[-1] + fuse_val)
+
+        self.firework_eval = np.array(self.firework_eval)
+        self.fuse_eval = np.array(self.fuse_eval)
 
     @staticmethod
     def one_hot_hint(hint):

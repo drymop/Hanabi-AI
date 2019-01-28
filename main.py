@@ -28,6 +28,8 @@ if __name__ == '__main__':
         n_epochs_per_iter=64,
         explore_rate=(1, 0.15, 0.01),
         discount_rate=0.97,
+        firework_eval=(1,0.5),
+        fuse_eval=(0.5,0.1),
     )
     trainer = Trainer(game_configs, model_configs, train_configs)
     trainer.start_training()
