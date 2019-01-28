@@ -3,6 +3,9 @@ from trainers.dqntrainer import Trainer
 from utils.attributedict import AttributeDict
 
 if __name__ == '__main__':
+    save_folder = input('Save folder name: ')
+    print('Saving into folder: "{}"'.format(save_folder))
+
     n_players = 3
     game_configs = AttributeDict(
         n_players=n_players,
@@ -17,12 +20,14 @@ if __name__ == '__main__':
         n_dense_after_rnn=3,
         n_outputs=Game.ACTIONS_PER_N_PLAYERS[n_players],
         learn_rate=1e-4,
+        dropout_rate=0.5,
     )
     train_configs = AttributeDict(
-        save_folder='save3',
+        save_folder=save_folder,
         buffer_size=32768,  # 2^15
         n_games_per_iter=1024,
         n_validation_games_per_iter=128,
+        update_target_model_every_n_iter=5,
         batch_size=128,
         time_steps=32,
         n_epochs_per_iter=64,

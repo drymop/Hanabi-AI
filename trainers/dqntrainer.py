@@ -212,11 +212,12 @@ class Trainer:
 
         return game, time_series
 
-    def train(self, iteration, n_epochs):
+    def train(self, iteration, n_epochs, update_target_model=True):
         save_file = Trainer.checkpoint_file_name(iteration)
         save_folder = self.train_configs.save_folder
         self.train_model.save_checkpoint(folder=save_folder, filename=save_file)
-        self.target_model.load_checkpoint(folder=save_folder, filename=save_file)
+        if update_target_model:
+            self.target_model.load_checkpoint(folder=save_folder, filename=save_file)
 
         batch_size = self.train_configs.batch_size
         time_steps = self.train_configs.time_steps
@@ -352,7 +353,8 @@ class Trainer:
                   .format(valid_score, valid_eval, valid_deaths, valid_turns))
 
             # train
-            loss = self.train(it, self.train_configs.n_epochs_per_iter)
+            update_target_model = it % self.train_configs.update_target_model_every_n_iter == 0
+            loss = self.train(it, self.train_configs.n_epochs_per_iter, update_target_model=update_target_model)
             print('\nloss: {}'.format(loss))
 
             iter_total_time = time.time() - start_iter_time

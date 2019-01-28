@@ -23,6 +23,7 @@ class Model(object):
         n_dense_before_rnn = model_configs.n_dense_before_rnn
         n_outputs = model_configs.n_outputs
         learn_rate = model_configs.learn_rate
+        dropout_rate = model_configs.dropout_rate
         # game configs
         n_ranks = game_configs.n_ranks
         n_suits = game_configs.n_suits
@@ -36,7 +37,7 @@ class Model(object):
             # Input placeholders
 
             with tf.variable_scope('inputs'):
-                self.inputs = namedtuple('InputHeads', 'game_state rnn_init_state loss_mask targets')(
+                self.inputs = namedtuple('InputHeads', 'game_state rnn_init_state loss_mask targets is_training')(
                     game_state=Model.StateFeatures(
                         cur_player=tf.placeholder(tf.int32, shape=[None, None], name='cur_player'),
                         remain_tiles=tf.placeholder(tf.float32, shape=[None, None, n_tile_types], name='remain_tiles'),
@@ -54,6 +55,7 @@ class Model(object):
                                                   name='rnn_init_state'),
                     loss_mask=tf.placeholder(tf.float32, shape=[None, None, n_outputs], name='loss_mask'),
                     targets=tf.placeholder(tf.float32, shape=[None, None, n_outputs], name='targets'),
+                    is_training=tf.placeholder(tf.bool, shape=(), name='is_training')
                 )
             # -------------------------
             # Pre-process input heads into 1 large input array:
@@ -70,7 +72,7 @@ class Model(object):
             # flatten hands and hints
             hands_hints = tf.concat([one_hot_hands, self.inputs.game_state.hints], axis=2)
             shape = hands_hints.shape
-            hands_hints = tf.reshape(hands_hints, [-1, time_steps, shape[2]*shape[3]*shape[4]])  # flatten
+            hands_hints = tf.reshape(hands_hints, [-1, time_steps, shape[2] * shape[3] * shape[4]])  # flatten
 
             # subtract the seen tiles from other players
             remain_tiles = self.inputs.game_state.remain_tiles - tf.reduce_sum(one_hot_hands, axis=[2, 3])
@@ -90,7 +92,6 @@ class Model(object):
             # one hot vector for last action
             one_hot_last_actions = tf.one_hot(self.inputs.game_state.last_action, n_outputs - 1)
 
-
             # Processed input concat into a 2D array (batch_size x num_features)
             concated_inputs = tf.concat(
                 [one_hot_cur_player, remain_tiles, hands_hints, one_hot_fireworks, n_hint_tokens, n_fuse_tokens,
@@ -99,8 +100,8 @@ class Model(object):
             # -------------------------
             # compress the sparse input through dense layers
             layer = concated_inputs
-            for i in range(n_dense_before_rnn-1):
-                layer = tf.layers.dense(layer, 128, activation=tf.nn.leaky_relu)
+            for i in range(n_dense_before_rnn - 1):
+                layer = self._create_dense_layer(layer, 128, tf.nn.relu, dropout_rate, self.inputs.is_training)
             rnn_inputs = tf.layers.dense(layer, n_rnn_hiddens, activation=tf.nn.leaky_relu)
 
             # -------------------------
@@ -118,8 +119,8 @@ class Model(object):
             # -------------------------
             # Compress rnn output through multiple dense layer to get the final result
             layer = rnn_outputs
-            for i in range(n_dense_after_rnn-1):
-                layer = tf.layers.dense(layer, 64, activation=tf.nn.leaky_relu)
+            for i in range(n_dense_after_rnn - 1):
+                layer = self._create_dense_layer(layer, 64, tf.nn.leaky_relu, dropout_rate, self.inputs.is_training)
             dense = tf.layers.dense(layer, n_outputs)
             self.outputs = tf.multiply(dense, self.inputs.game_state.valid_mask)
 
@@ -149,12 +150,19 @@ class Model(object):
         # Save and load operations
         self.saver = tf.train.Saver(self.graph.get_collection('variables'), max_to_keep=10000000)
 
+    @staticmethod
+    def _create_dense_layer(input_layer, n_outputs, activation_fn, dropout_rate, is_training):
+        dense = tf.layers.dense(input_layer, n_outputs, activation=activation_fn)
+        batch_norm = tf.layers.batch_normalization(dense)
+        return tf.layers.dropout(batch_norm, rate=dropout_rate, training=is_training)
+
     def predict(self, games, rnn_init_state):
         """
         Give the predicted Q values of a batch of game
         """
         input_dict = {tensor: value for tensor, value in zip(self.inputs.game_state, games)}
         input_dict[self.inputs.rnn_init_state] = rnn_init_state
+        input_dict[self.inputs.is_training] = False
         q_values, rnn_state = self.sess.run([self.outputs, self.rnn_state], feed_dict=input_dict)
 
         return q_values, rnn_state
@@ -169,6 +177,7 @@ class Model(object):
         input_dict[self.inputs.rnn_init_state] = rnn_init_state
         input_dict[self.inputs.loss_mask] = loss_mask
         input_dict[self.inputs.targets] = targets
+        input_dict[self.inputs.is_training] = True
         loss, _ = self.sess.run([self.loss, self.train_step], feed_dict=input_dict)
         return loss
 
