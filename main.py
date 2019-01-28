@@ -16,10 +16,10 @@ if __name__ == '__main__':
         n_dense_before_rnn=3,
         n_dense_after_rnn=3,
         n_outputs=Game.ACTIONS_PER_N_PLAYERS[n_players],
-        learn_rate=2e-5,
+        learn_rate=1e-4,
     )
     train_configs = AttributeDict(
-        save_folder='save',
+        save_folder='save3',
         buffer_size=32768,  # 2^15
         n_games_per_iter=1024,
         n_validation_games_per_iter=128,
