@@ -34,8 +34,7 @@ class Trainer:
         # model used during training iteration while train_model is being updated
         self.target_model = Model(game_configs, model_configs)
 
-        self.buffer_size = 32768  # 2^15
-        self.experience_buffer = ExperienceBuffer(self.buffer_size)
+        self.experience_buffer = ExperienceBuffer(self.train_configs.buffer_size)
 
         # -------------------------
         # Precomputed neural network's inputs
@@ -212,11 +211,12 @@ class Trainer:
 
         return game, time_series
 
-    def train(self, iteration, n_epochs, update_target_model=True):
+    def train(self, iteration, n_epochs, update_target_model=False):
         save_file = Trainer.checkpoint_file_name(iteration)
         save_folder = self.train_configs.save_folder
         self.train_model.save_checkpoint(folder=save_folder, filename=save_file)
         if update_target_model:
+            print('Updating target model')
             self.target_model.load_checkpoint(folder=save_folder, filename=save_file)
 
         batch_size = self.train_configs.batch_size
@@ -286,7 +286,7 @@ class Trainer:
         avg_score = 0
         avg_eval = 0
         avg_turns = 0
-        n_random_games = self.buffer_size // self.game_configs.n_players // 2  # fill half of the buffer
+        n_random_games = self.train_configs.buffer_size // self.game_configs.n_players // 2  # fill half of the buffer
         # n_random_games = 1
 
         for i in range(n_random_games):
