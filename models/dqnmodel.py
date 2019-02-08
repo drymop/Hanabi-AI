@@ -102,7 +102,7 @@ class Model(object):
             layer = concated_inputs
             for i in range(n_dense_before_rnn - 1):
                 layer = self._create_dense_layer(layer, 128, tf.nn.relu, dropout_rate, self.inputs.is_training)
-            rnn_inputs = tf.layers.dense(layer, n_rnn_hiddens, activation=tf.nn.leaky_relu)
+            rnn_inputs = tf.layers.dense(layer, n_rnn_hiddens, activation=tf.nn.leaky_relu, kernel_initializer=tf.contrib.layers.variance_scaling_initializer())
 
             # -------------------------
             # Recurrent layer
@@ -121,7 +121,7 @@ class Model(object):
             layer = rnn_outputs
             for i in range(n_dense_after_rnn - 1):
                 layer = self._create_dense_layer(layer, 64, tf.nn.leaky_relu, dropout_rate, self.inputs.is_training)
-            dense = tf.layers.dense(layer, n_outputs)
+            dense = tf.layers.dense(layer, n_outputs, activation=tf.nn.leaky_relu, kernel_initializer=tf.contrib.layers.variance_scaling_initializer())
             self.outputs = tf.multiply(dense, self.inputs.game_state.valid_mask)
 
             # -------------------------
@@ -152,8 +152,10 @@ class Model(object):
 
     @staticmethod
     def _create_dense_layer(input_layer, n_outputs, activation_fn, dropout_rate, is_training):
-        dense = tf.layers.dense(input_layer, n_outputs, activation=activation_fn)
+        dense = tf.layers.dense(input_layer, n_outputs, activation=activation_fn, kernel_initializer=tf.contrib.layers.variance_scaling_initializer())
         batch_norm = tf.layers.batch_normalization(dense)
+        if dropout_rate <= 0:
+            return batch_norm
         return tf.layers.dropout(batch_norm, rate=dropout_rate, training=is_training)
 
     def predict(self, games, rnn_init_state):

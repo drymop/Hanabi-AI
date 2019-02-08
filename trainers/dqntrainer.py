@@ -372,8 +372,9 @@ class Trainer:
             explore_rate = max(explore_rate - explore_rate_decrease, explore_rate_end)
 
     def eval_game_state(self, game_state):
-        return sum(self.firework_eval[x] for x in game_state.fireworks) \
-               - self.fuse_eval[Game.MAX_FUSES - game_state.n_fuse_tokens]
+#        return sum(self.firework_eval[x] for x in game_state.fireworks) \
+#               - self.fuse_eval[Game.MAX_FUSES - game_state.n_fuse_tokens]
+        return sum(game_state.fireworks) / (Game.MAX_FUSES + 1 - game_state.n_fuse_tokens)
 
     @staticmethod
     def checkpoint_file_name(iteration):
