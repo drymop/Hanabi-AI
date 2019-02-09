@@ -53,7 +53,7 @@ class Model(object):
                     rnn_init_state=tf.placeholder(tf.float32,
                                                   shape=[n_rnn_layers, 2, None, n_rnn_hiddens],
                                                   name='rnn_init_state'),
-                    loss_mask=tf.placeholder(tf.float32, shape=[None, None], name='loss_mask'),
+                    loss_mask=tf.placeholder(tf.int32, shape=[None, None], name='loss_mask'),
                     targets=tf.placeholder(tf.float32, shape=[None, None, n_outputs], name='targets'),
                     is_training=tf.placeholder(tf.bool, shape=(), name='is_training')
                 )
@@ -107,9 +107,10 @@ class Model(object):
 
             # -------------------------
             # Recurrent layer
-            rnn_single_cell = tf.nn.rnn_cell.LSTMCell(n_rnn_hiddens, forget_bias=1.0, activation=tf.nn.leaky_relu,
-                                                      state_is_tuple=True)
-            self.rnn_cell = tf.nn.rnn_cell.MultiRNNCell([rnn_single_cell] * n_rnn_layers, state_is_tuple=True)
+            rnn_cells = [tf.nn.rnn_cell.LSTMCell(n_rnn_hiddens, forget_bias=1.0, activation=tf.nn.leaky_relu,
+                                                 state_is_tuple=True)
+                         for _ in range(n_rnn_layers)]
+            self.rnn_cell = tf.nn.rnn_cell.MultiRNNCell(rnn_cells, state_is_tuple=True)
 
             unstacked_states = tf.unstack(self.inputs.rnn_init_state)  # for each layer
             initial_state_tuple = tuple(tf.nn.rnn_cell.LSTMStateTuple(*tf.unstack(state)) for state in unstacked_states)

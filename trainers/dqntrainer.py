@@ -25,7 +25,6 @@ class Trainer:
         n_rnn_hiddens = model_configs.n_rnn_hiddens
 
         batch_size = train_configs.batch_size
-        time_steps = train_configs.time_steps
 
         # -------------------------
         # models to train and experience buffer
