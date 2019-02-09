@@ -53,7 +53,7 @@ class Model(object):
                     rnn_init_state=tf.placeholder(tf.float32,
                                                   shape=[n_rnn_layers, 2, None, n_rnn_hiddens],
                                                   name='rnn_init_state'),
-                    loss_mask=tf.placeholder(tf.float32, shape=[None, None, n_outputs], name='loss_mask'),
+                    loss_mask=tf.placeholder(tf.float32, shape=[None, None], name='loss_mask'),
                     targets=tf.placeholder(tf.float32, shape=[None, None, n_outputs], name='targets'),
                     is_training=tf.placeholder(tf.bool, shape=(), name='is_training')
                 )
@@ -102,7 +102,8 @@ class Model(object):
             layer = concated_inputs
             for i in range(n_dense_before_rnn - 1):
                 layer = self._create_dense_layer(layer, 128, tf.nn.relu, dropout_rate, self.inputs.is_training)
-            rnn_inputs = tf.layers.dense(layer, n_rnn_hiddens, activation=tf.nn.leaky_relu, kernel_initializer=tf.contrib.layers.variance_scaling_initializer())
+            rnn_inputs = tf.layers.dense(layer, n_rnn_hiddens, activation=tf.nn.leaky_relu,
+                                         kernel_initializer=tf.contrib.layers.variance_scaling_initializer())
 
             # -------------------------
             # Recurrent layer
@@ -121,14 +122,17 @@ class Model(object):
             layer = rnn_outputs
             for i in range(n_dense_after_rnn - 1):
                 layer = self._create_dense_layer(layer, 64, tf.nn.leaky_relu, dropout_rate, self.inputs.is_training)
-            dense = tf.layers.dense(layer, n_outputs, activation=tf.nn.leaky_relu, kernel_initializer=tf.contrib.layers.variance_scaling_initializer())
+            dense = tf.layers.dense(layer, n_outputs, activation=tf.nn.leaky_relu,
+                                    kernel_initializer=tf.contrib.layers.variance_scaling_initializer())
             self.outputs = tf.multiply(dense, self.inputs.game_state.valid_mask)
 
             # -------------------------
             # Back propagation layer
+            one_hot_loss_mask = tf.one_hot(self.inputs.loss_mask, n_outputs)
+
             self.loss = tf.losses.mean_squared_error(self.inputs.targets,
                                                      self.outputs,
-                                                     weights=self.inputs.loss_mask)
+                                                     weights=one_hot_loss_mask)
 
             # unmasked_loss = tf.nn.softmax_cross_entropy_with_logits_v2(targets=self.targets, logits=outputs)
             # self.loss = tf.reduce_mean(tf.boolean_mask(unmasked_loss, self.loss_mask))
@@ -152,7 +156,8 @@ class Model(object):
 
     @staticmethod
     def _create_dense_layer(input_layer, n_outputs, activation_fn, dropout_rate, is_training):
-        dense = tf.layers.dense(input_layer, n_outputs, activation=activation_fn, kernel_initializer=tf.contrib.layers.variance_scaling_initializer())
+        dense = tf.layers.dense(input_layer, n_outputs, activation=activation_fn,
+                                kernel_initializer=tf.contrib.layers.variance_scaling_initializer())
         batch_norm = tf.layers.batch_normalization(dense)
         if dropout_rate <= 0:
             return batch_norm

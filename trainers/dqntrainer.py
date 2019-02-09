@@ -45,7 +45,7 @@ class Trainer:
         self.valid_mask_do_nothing[-1] = 1
 
         # loss masks
-        self.loss_mask_batch_all = np.ones(shape=(batch_size, time_steps, n_actions))
+        # self.loss_mask_batch_all = np.ones(shape=(batch_size, time_steps, n_actions))
 
         # rnn zero state for a batch
         self.rnn_zero_state_batch = np.zeros((n_rnn_layers, 2, batch_size, n_rnn_hiddens))
@@ -249,12 +249,24 @@ class Trainer:
                     action, reward = batch[i][j + 1].last_action, batch_rewards[i][j]
                     q_values[i][j][action] = reward + discount_rate * max(q_values[i][j + 1])
 
+            # mask the loss from action that is not taken at a step
+            do_nothing_action = Game.ACTIONS_PER_N_PLAYERS[self.game_configs.n_players] - 1
+            loss_mask = np.empty([batch_size, time_steps], np.int8)
+            for i in range(batch_size):
+                for j in range(time_steps):
+                    if batch[i][j].cur_player == 0:
+                        loss_mask[i][j] = batch[i][j+1].last_action
+                    else:
+                        loss_mask[i][j] = do_nothing_action
+
             # remove the last time step
             for series in batch:
                 series.pop()
             q_values = np.delete(q_values, -1, axis=1)
+
+            # train
             loss = self.train_model.train(Trainer.format_batch(batch),
-                                          self.rnn_zero_state_batch, q_values, self.loss_mask_batch_all)
+                                          self.rnn_zero_state_batch, q_values, loss_mask)
             avg_loss += loss
         return avg_loss / n_epochs
 
@@ -372,9 +384,9 @@ class Trainer:
             explore_rate = max(explore_rate - explore_rate_decrease, explore_rate_end)
 
     def eval_game_state(self, game_state):
-#        return sum(self.firework_eval[x] for x in game_state.fireworks) \
-#               - self.fuse_eval[Game.MAX_FUSES - game_state.n_fuse_tokens]
-        return sum(game_state.fireworks) / (Game.MAX_FUSES + 1 - game_state.n_fuse_tokens)
+        return sum(self.firework_eval[x] for x in game_state.fireworks) \
+               - self.fuse_eval[Game.MAX_FUSES - game_state.n_fuse_tokens]
+        # return sum(game_state.fireworks) / (Game.MAX_FUSES + 1 - game_state.n_fuse_tokens)
 
     @staticmethod
     def checkpoint_file_name(iteration):
