@@ -188,16 +188,13 @@ class Trainer:
         choices = []
         # play tile that win 100%
         for j, tile in enumerate(game.hands[game.cur_player]):
-            if game.fireworks[tile.id] == tile.rank \
+            if game.fireworks[tile.suit] == tile.rank \
                     and game.hints[game.cur_player][j][0].count(True) == 1 \
                     and game.hints[game.cur_player][j][1].count(True) == 1:
                 choices.append(j)
         if choices:
             return choices
-        # cannot hint, return the list of discard
-        if game.n_hint_tokens == 0:
-            return [j for j in range(game.hand_size, 2*game.hand_size) if game.is_valid_action[j]]
-        # hint or discard randomly
+        # cannot play, return the list of discard or hint
         return [j for j in range(game.hand_size, game.n_actions) if game.is_valid_action[j]]
 
     def play_random(self):
