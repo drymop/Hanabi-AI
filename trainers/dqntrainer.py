@@ -118,11 +118,12 @@ class Trainer:
             batch[i] = series[r:r + time_steps + 1]
         return batch
 
-    def play_batch(self, n_games, explore_rate=0.1):
+    def play_batch(self, n_games, explore_rate, help_rate):
         """
         Play a batch of games using the train_model neural network to select move
         :param n_games: number of games
         :param explore_rate: probability that a move is chosen randomly (instead of choosing the best move)
+        :param help_rate: probability that a move is chosen heuristically (instead of choosing the best move)
         :return: list of games played and list of time series
         """
         n_players = self.game_configs.n_players
@@ -155,10 +156,14 @@ class Trainer:
                 if game.is_over:
                     continue
                 [action_qs] = batch_q[i * n_players + game.cur_player]
-                if random.random() > explore_rate:
+                rand_number = random.random()
+                if rand_number > explore_rate + help_rate:
                     # choose best action
                     best_q = max(action_qs[j] for j in range(game.n_actions) if game.is_valid_action[j])
                     choices = [j for j in range(game.n_actions) if action_qs[j] == best_q]
+                elif rand_number > explore_rate:
+                    # help guide action
+                    choices = Trainer.heuristic_play(game)
                 else:
                     # choose a random action
                     choices = [j for j in range(game.n_actions) if game.is_valid_action[j]]
@@ -177,6 +182,23 @@ class Trainer:
                 for _ in range(n_pad):
                     time_series[i * n_players + j].append(terminal_states[j])
         return games, time_series
+
+    @staticmethod
+    def heuristic_play(game):
+        choices = []
+        # play tile that win 100%
+        for j, tile in enumerate(game.hands[game.cur_player]):
+            if game.fireworks[tile.id] == tile.rank \
+                    and game.hints[game.cur_player][j][0].count(True) == 1 \
+                    and game.hints[game.cur_player][j][1].count(True) == 1:
+                choices.append(j)
+        if choices:
+            return choices
+        # cannot hint, return the list of discard
+        if game.n_hint_tokens == 0:
+            return [j for j in range(game.hand_size, 2*game.hand_size) if game.is_valid_action[j]]
+        # hint or discard randomly
+        return [j for j in range(game.hand_size, game.n_actions) if game.is_valid_action[j]]
 
     def play_random(self):
         """Play a game randomly and return the episode.
@@ -305,7 +327,8 @@ class Trainer:
             # add to buffer
             _eval = self.eval_game_state(time_series[0][-1])  # evaluation of the final state
             for time_series_a_player in time_series:
-                self.experience_buffer.add(Experience(_eval, time_series_a_player), weighted=True)
+                self.experience_buffer.add(Experience(_eval, time_series_a_player),
+                                           weighted=self.train_configs.weighted_buffer)
             # update average
             avg_score += game.score
             avg_eval += _eval
@@ -326,6 +349,8 @@ class Trainer:
 
         explore_rate_start, explore_rate_end, explore_rate_decrease = self.train_configs.explore_rate
         explore_rate = explore_rate_start
+        help_rate_start, help_rate_end, help_rate_decrease = self.train_configs.help_rate
+        help_rate = help_rate_start
         n_sample_games = self.train_configs.n_games_per_iter
         n_validation_games = self.train_configs.n_validation_games_per_iter
         # do iterations 0 -> infinity
@@ -333,15 +358,16 @@ class Trainer:
             start_iter_time = time.time()
             print('===================================== ITER {} ========================================='.format(it))
             print('explore rate: {}'.format(explore_rate))
+            print('help rate: {}'.format(help_rate))
 
             # create sample games by playing with exploration on
-            games, batch_time_series = self.play_batch(n_sample_games, explore_rate=explore_rate)
+            games, batch_time_series = self.play_batch(n_sample_games, explore_rate=explore_rate, help_rate=help_rate)
             # add sample games to experience buffer
             sample_eval = 0
             for time_series in batch_time_series:
                 _eval = self.eval_game_state(time_series[-1])
                 sample_eval += _eval
-                self.experience_buffer.add(Experience(_eval, time_series), weighted=True)
+                self.experience_buffer.add(Experience(_eval, time_series), weighted=self.train_configs.weighted_buffer)
             # print statistics
             sample_score = sum(game.score for game in games) / n_sample_games
             sample_eval = sample_eval / len(batch_time_series)
@@ -353,7 +379,7 @@ class Trainer:
                           sample_turns))
 
             # create validation games by playing with exploration off, these games are not added to experience buffer
-            games, batch_time_series = self.play_batch(n_validation_games, explore_rate=0)
+            games, batch_time_series = self.play_batch(n_validation_games, explore_rate=0, help_rate=0)
             # print statistics
             valid_score = sum(game.score for game in games) / n_validation_games
             valid_eval = sum(self.eval_game_state(ts[-1]) for ts in batch_time_series) / len(batch_time_series)
@@ -381,11 +407,38 @@ class Trainer:
 
             # update iteration related variables
             explore_rate = max(explore_rate - explore_rate_decrease, explore_rate_end)
+            help_rate = max(help_rate - help_rate_decrease, help_rate_end)
 
     def eval_game_state(self, game_state):
         return sum(self.firework_eval[x] for x in game_state.fireworks) \
                - self.fuse_eval[Game.MAX_FUSES - game_state.n_fuse_tokens]
         # return sum(game_state.fireworks) / (Game.MAX_FUSES + 1 - game_state.n_fuse_tokens)
+
+    # def test(self):
+    #     n_players = self.game_configs.n_players
+    #     game = Game(n_players)
+    #     rnn_state = np.zeros((self.model_configs.n_rnn_layers, 2, n_players, self.model_configs.n_rnn_hiddens))
+    #     last_action = -1
+    #
+    #     while not game.is_over:
+    #         game_states = self.extract_game_state(game, last_action)
+    #         nn_inputs = Trainer.format_batch(game_states)
+    #         batch_q, rnn_state = self.train_model.predict(nn_inputs, rnn_state)
+    #
+    #         # choose action randomly
+    #         [action_qs] = batch_q[game.cur_player]
+    #
+    #
+    #         # choose best action
+    #         best_q = max(action_qs[j] for j in range(game.n_actions) if game.is_valid_action[j])
+    #         choices = [j for j in range(game.n_actions) if action_qs[j] == best_q]
+    #         action_id = random.choice(choices)
+    #         action = game.actions[action_id]
+    #         pp(best_q)
+    #         pp(action_id)
+    #         pp(action)
+    #         game.play(action)
+    #         last_action = action_id
 
     @staticmethod
     def checkpoint_file_name(iteration):

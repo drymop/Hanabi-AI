@@ -95,13 +95,13 @@ class Game(object):
                 ac = Action(ActionType.HINT)
                 ac.target_player = p
                 ac.hint_attribute = r
-                ac.hint_is_color = False
+                ac.hint_is_suit = False
                 self.actions.append(ac)
             for c in Game.SUITS:
                 ac = Action(ActionType.HINT)
                 ac.target_player = p
                 ac.hint_attribute = c
-                ac.hint_is_color = True
+                ac.hint_is_suit = True
                 self.actions.append(ac)
         self.actions.append(Action(ActionType.NONE))  # do nothing
         self.n_actions = Game.ACTIONS_PER_N_PLAYERS[self.n_players]
@@ -195,7 +195,7 @@ class Game(object):
         player = (self.cur_player + action.target_player) % self.n_players
         attribute = action.hint_attribute
 
-        if action.hint_is_color:
+        if action.hint_is_suit:
             for i in range(self.hand_size):
                 match = self.hands[player][i].suit == attribute
                 tile_hint = self.hints[player][i][1]
