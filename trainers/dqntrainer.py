@@ -187,7 +187,7 @@ class Trainer:
     def heuristic_forbidden_choices(game):
         non_playable = []
         for j, tile in enumerate(game.hands[game.cur_player]):
-            if game.fireworks[tile.id] == tile.rank \
+            if game.fireworks[tile.suit] == tile.rank \
                     and game.hints[game.cur_player][j][0].count(True) == 1 \
                     and game.hints[game.cur_player][j][1].count(True) == 1:
                 non_playable.append(game.hand_size + j) # surely playable, should not discard
@@ -211,6 +211,7 @@ class Trainer:
     #         return [j for j in range(game.hand_size, 2 * game.hand_size) if game.is_valid_action[j]]
     #     # hint or discard randomly
     #     return [j for j in range(game.hand_size, game.n_actions) if game.is_valid_action[j]]
+
 
     def play_random(self):
         """Play a game randomly and return the episode.
