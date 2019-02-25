@@ -157,15 +157,15 @@ class Trainer:
                     continue
                 [action_qs] = batch_q[i * n_players + game.cur_player]
                 rand_number = random.random()
-                if rand_number > explore_rate + help_rate:
-                    # choose best action
+                if rand_number > explore_rate:
+                    # choose best action among the heuristically allowed actions
+                    forbidden_choices = Trainer.heuristic_forbidden_choices(game)
+                    for action_id in forbidden_choices:
+                        action_qs[action_id] = -128
                     best_q = max(action_qs[j] for j in range(game.n_actions) if game.is_valid_action[j])
                     choices = [j for j in range(game.n_actions) if action_qs[j] == best_q]
-                elif rand_number > explore_rate:
-                    # help guide action
-                    choices = Trainer.heuristic_play(game)
                 else:
-                    # choose a random action
+                    # explore - choose a random action
                     choices = [j for j in range(game.n_actions) if game.is_valid_action[j]]
                 action_id = random.choice(choices)
                 action = game.actions[action_id]
@@ -184,21 +184,33 @@ class Trainer:
         return games, time_series
 
     @staticmethod
-    def heuristic_play(game):
-        choices = []
-        # play tile that win 100%
+    def heuristic_forbidden_choices(game):
+        non_playable = []
         for j, tile in enumerate(game.hands[game.cur_player]):
             if game.fireworks[tile.id] == tile.rank \
                     and game.hints[game.cur_player][j][0].count(True) == 1 \
                     and game.hints[game.cur_player][j][1].count(True) == 1:
-                choices.append(j)
-        if choices:
-            return choices
-        # cannot hint, return the list of discard
-        if game.n_hint_tokens == 0:
-            return [j for j in range(game.hand_size, 2*game.hand_size) if game.is_valid_action[j]]
-        # hint or discard randomly
-        return [j for j in range(game.hand_size, game.n_actions) if game.is_valid_action[j]]
+                non_playable.append(game.hand_size + j) # surely playable, should not discard
+            else:
+                non_playable.append(j)  # not surely playable, do not play
+        return non_playable
+
+    # @staticmethod
+    # def heuristic_play(game):
+    #     choices = []
+    #     # play tile that win 100%
+    #     for j, tile in enumerate(game.hands[game.cur_player]):
+    #         if game.fireworks[tile.id] == tile.rank \
+    #                 and game.hints[game.cur_player][j][0].count(True) == 1 \
+    #                 and game.hints[game.cur_player][j][1].count(True) == 1:
+    #             choices.append(j)
+    #     if choices:
+    #         return choices
+    #     # cannot hint, return the list of discard
+    #     if game.n_hint_tokens == 0:
+    #         return [j for j in range(game.hand_size, 2 * game.hand_size) if game.is_valid_action[j]]
+    #     # hint or discard randomly
+    #     return [j for j in range(game.hand_size, game.n_actions) if game.is_valid_action[j]]
 
     def play_random(self):
         """Play a game randomly and return the episode.
