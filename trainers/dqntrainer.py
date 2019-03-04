@@ -7,6 +7,7 @@ import time
 
 from game import Game
 from models.dqnmodel import Model
+from utils.consoledisplay import display_action, display_state
 from utils.expbuffer import Experience, ExperienceBuffer
 
 
@@ -429,31 +430,44 @@ class Trainer:
                - self.fuse_eval[Game.MAX_FUSES - game_state.n_fuse_tokens]
         # return sum(game_state.fireworks) / (Game.MAX_FUSES + 1 - game_state.n_fuse_tokens)
 
-    # def test(self):
-    #     n_players = self.game_configs.n_players
-    #     game = Game(n_players)
-    #     rnn_state = np.zeros((self.model_configs.n_rnn_layers, 2, n_players, self.model_configs.n_rnn_hiddens))
-    #     last_action = -1
-    #
-    #     while not game.is_over:
-    #         game_states = self.extract_game_state(game, last_action)
-    #         nn_inputs = Trainer.format_batch(game_states)
-    #         batch_q, rnn_state = self.train_model.predict(nn_inputs, rnn_state)
-    #
-    #         # choose action randomly
-    #         [action_qs] = batch_q[game.cur_player]
-    #
-    #
-    #         # choose best action
-    #         best_q = max(action_qs[j] for j in range(game.n_actions) if game.is_valid_action[j])
-    #         choices = [j for j in range(game.n_actions) if action_qs[j] == best_q]
-    #         action_id = random.choice(choices)
-    #         action = game.actions[action_id]
-    #         pp(best_q)
-    #         pp(action_id)
-    #         pp(action)
-    #         game.play(action)
-    #         last_action = action_id
+    def test(self):
+        n_players = self.game_configs.n_players
+        game = Game(n_players)
+        rnn_state = np.zeros((self.model_configs.n_rnn_layers, 2, n_players, self.model_configs.n_rnn_hiddens))
+        last_action = -1
+
+        while not game.is_over:
+            game_states = self.extract_game_state(game, last_action)
+            nn_inputs = Trainer.format_batch(game_states)
+            batch_q, rnn_state = self.train_model.predict(nn_inputs, rnn_state)
+
+            # display game
+            display_state(game, first_person=False)
+
+            # choose best action
+            [action_qs] = batch_q[game.cur_player]
+
+            # choose best action among the heuristically allowed actions
+            forbidden_choices = Trainer.heuristic_forbidden_choices(game)
+            for action_id in forbidden_choices:
+                action_qs[action_id] = -99
+
+            best_q = max(action_qs[j] for j in range(game.n_actions) if game.is_valid_action[j])
+            choices = [j for j in range(game.n_actions) if action_qs[j] == best_q]
+            action_id = random.choice(choices)
+            action = game.actions[action_id]
+
+            print("Q vector:")
+            fm1 = ' '.join(['%5d'] * len(action_qs))
+            fm2 = ' '.join(['%5.1f'] * len(action_qs))
+            print(fm2 % tuple(batch_q))
+            print(fm1 % tuple(range(len(batch_q))))
+
+            print("Chosen action is {}:".format(action_id))
+            display_action(action)
+
+            game.play(action)
+            last_action = action_id
 
     @staticmethod
     def checkpoint_file_name(iteration):

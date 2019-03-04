@@ -38,5 +38,6 @@ if __name__ == '__main__':
         firework_eval=(1,0.5),
         fuse_eval=(0, 0),
     )
+
     trainer = Trainer(game_configs, model_configs, train_configs)
     trainer.start_training()

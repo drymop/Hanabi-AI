@@ -1,38 +1,48 @@
 from game import Game
+from trainers.dqntrainer import Trainer
+from utils.attributedict import AttributeDict
 
-load_model = ""
-n_players = 3
+if __name__ == '__main__':
+    load_folder = ''
+    load_file = ''
 
-def play(model):
-  g = Game(n_players)
-  while not g.is_over:
-    # extract game state per player per game into each time series
-    for i in range(n_games):
-      if games[i].is_over:
-        continue
-      cur_game_states = self.extract_game_state(games[i], last_actions[i])
-      for j in range(n_players):
-        time_series[i * n_players + j].append(cur_game_states[j])
+    n_players = 3
+    game_configs = AttributeDict(
+        n_players=n_players,
+        n_ranks=Game.N_RANKS,
+        n_suits=Game.N_SUITS,
+        hand_size=Game.HAND_SIZE_PER_N_PLAYERS[n_players],
+    )
+    model_configs = AttributeDict(
+        n_rnn_hiddens=64,
+        n_rnn_layers=3,
+        n_dense_before_rnn=3,
+        n_dense_after_rnn=3,
+        n_outputs=Game.ACTIONS_PER_N_PLAYERS[n_players],
+        learn_rate=1e-4,
+        dropout_rate=0.3,
+    )
+    train_configs = AttributeDict(
+        save_folder=None,
+        buffer_size=65536,  # 2^16
+        weighted_buffer=False,
+        n_games_per_iter=2048,
+        n_validation_games_per_iter=128,
+        update_target_model_every_n_iter=5,
+        batch_size=128,
+        time_steps=16,
+        n_epochs_per_iter=64,
+        explore_rate=(1, 0.1, 0.001),
+        help_rate=(0, 0, 0),
+        discount_rate=0.9,
+        firework_eval=(1,0.5),
+        fuse_eval=(0, 0),
+    )
 
-    # use NN to figure out next move for each game
-    cur_game_states = [[ts[-1]] for ts in time_series]  # shape=(batch_size, time_step=1)
-    nn_inputs = Trainer.format_batch(cur_game_states)
-    batch_q, rnn_state = self.train_model.predict(nn_inputs, rnn_state)
-
-    # choose action for each game based on Q values
-    for i, game in enumerate(games):
-      if game.is_over:
-        continue
-      [action_qs] = batch_q[i * n_players + game.cur_player]
-      if random.random() > explore_rate:
-        # choose best action
-        best_q = max(action_qs[j] for j in range(game.n_actions) if game.is_valid_action[j])
-        choices = [j for j in range(game.n_actions) if action_qs[j] == best_q]
-      else:
-        # choose a random action
-        choices = [j for j in range(game.n_actions) if game.is_valid_action[j]]
-      action_id = random.choice(choices)
-      action = game.actions[action_id]
-      game.play(action)
-
-      last_actions[i] = action_id
+    trainer = Trainer(game_configs, model_configs, train_configs)
+    trainer.target_model.load_checkpoint(folder=load_folder, filename=load_file)
+    while(True):
+        trainer.test()
+        print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+        print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+        input()
