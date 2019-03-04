@@ -288,7 +288,9 @@ class Trainer:
             loss_mask = np.empty([batch_size, time_steps], np.int8)
             for i in range(batch_size):
                 for j in range(time_steps):
-                    if batch[i][j].cur_player == 0:
+                    if batch[i][j].n_fuse_tokens == 0:  # game ended
+                        loss_mask[i][j] = -1
+                    elif batch[i][j].cur_player == 0:
                         loss_mask[i][j] = batch[i][j+1].last_action
                     else:
                         loss_mask[i][j] = do_nothing_action
