@@ -3,8 +3,8 @@ from trainers.dqntrainer import Trainer
 from utils.attributedict import AttributeDict
 
 if __name__ == '__main__':
-    save_folder = input('Save folder name: ')
-    print('Saving into folder: "{}"'.format(save_folder))
+    load_folder = ''
+    load_file = ''
 
     n_players = 3
     game_configs = AttributeDict(
@@ -23,7 +23,7 @@ if __name__ == '__main__':
         dropout_rate=0.3,
     )
     train_configs = AttributeDict(
-        save_folder=save_folder,
+        save_folder=None,
         buffer_size=65536,  # 2^16
         weighted_buffer=False,
         n_games_per_iter=2048,
@@ -40,4 +40,9 @@ if __name__ == '__main__':
     )
 
     trainer = Trainer(game_configs, model_configs, train_configs)
-    trainer.start_training()
+    trainer.target_model.load_checkpoint(folder=load_folder, filename=load_file)
+    while(True):
+        trainer.test()
+        print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+        print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+        input()

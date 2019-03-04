@@ -15,13 +15,6 @@ class ExperienceBuffer:
         self.avgScore = 0
         self.insertPoint = 0
 
-    def __iadd__(self, experiences):
-        '''
-        Add multiple experiences, with weight
-        '''
-        for e in experiences:
-            self.add(e, True)
-
     def add(self, experience, weighted=False):
         '''
         Add the experience to buffer
@@ -29,7 +22,7 @@ class ExperienceBuffer:
         weighted: add multiple copies if experience's score is higher than average score in buffer
         '''
         if weighted:
-            nInsert = max(experience.score-self.avgScore, 1) ** 2
+            nInsert = max(experience.score-self.avgScore+0.9, 1) ** 2
             # clamp between 1 and 100
             nInsert = math.ceil(nInsert)
             nInsert = max(1, nInsert)
