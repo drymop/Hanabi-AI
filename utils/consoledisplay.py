@@ -34,7 +34,7 @@ def display_state(game: Game, first_person=True):
     print()
 
     # print the tiles players' hands
-    hands = sum(([RANKS[t.rank], COLORS[t.color]] for p in range(0, n) for t in game.hands[p]), [])
+    hands = sum(([RANKS[t.rank], COLORS[t.suit]] for p in range(0, n) for t in game.hands[p]), [])
     if first_person:
         two_s = 2 * s
         hands[:] = [hands[i] if (i // two_s != game.cur_player) else '?' for i in range(0, len(hands))]
@@ -65,7 +65,7 @@ def display_action(game: Game, action):
         tile = game.hands[game.cur_player][action.target_tile]
         print('Discard tile {} ({}{})'.format(action.target_tile + 1, RANKS[tile.rank], COLORS[tile.suit]))
     elif action.type == ActionType.HINT:
-        attr = COLORS[action.hintAttribute] if action.hintIsColor else RANKS[action.hintAttribute]
+        attr = COLORS[action.hint_attribute] if action.hint_is_suit else RANKS[action.hint_attribute]
         target = (game.cur_player + action.target_player) % game.n_players + 1
         print('Hint player {} of all {} tiles'.format(target, attr))
     else:

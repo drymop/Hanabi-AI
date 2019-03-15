@@ -15,24 +15,24 @@ if __name__ == '__main__':
     )
     model_configs = AttributeDict(
         n_rnn_hiddens=64,
-        n_rnn_layers=3,
-        n_dense_before_rnn=3,
-        n_dense_after_rnn=3,
+        n_rnn_layers=1,
+        n_dense_before_rnn=1,
+        n_dense_after_rnn=1,
         n_outputs=Game.ACTIONS_PER_N_PLAYERS[n_players],
         learn_rate=1e-4,
         dropout_rate=0.3,
     )
     train_configs = AttributeDict(
         save_folder=save_folder,
-        buffer_size=65536,  # 2^16
-        weighted_buffer=False,
-        n_games_per_iter=2048,
+        buffer_size=16384,
+        weighted_buffer=True,
+        n_games_per_iter=512,
         n_validation_games_per_iter=128,
         update_target_model_every_n_iter=5,
         batch_size=128,
-        time_steps=16,
-        n_epochs_per_iter=64,
-        explore_rate=(1, 0.1, 0.001),
+        time_steps=8,
+        n_epochs_per_iter=16,
+        explore_rate=(1, 0.1, 0.01),
         help_rate=(0, 0, 0),
         discount_rate=0.9,
         firework_eval=(1,0.5),

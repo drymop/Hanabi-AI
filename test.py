@@ -3,8 +3,12 @@ from trainers.dqntrainer import Trainer
 from utils.attributedict import AttributeDict
 
 if __name__ == '__main__':
-    load_folder = ''
-    load_file = ''
+    load_folder = 'save21_5_fuses'
+    load_file = '1.ckpt'
+
+    #load_folder = input('Enter load folder: ')
+    #load_file = input('Enter load file: ')
+    #load_file += '.ckpt'
 
     n_players = 3
     game_configs = AttributeDict(

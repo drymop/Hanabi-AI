@@ -438,6 +438,7 @@ class Trainer:
 
         while not game.is_over:
             game_states = self.extract_game_state(game, last_action)
+            game_states = [[x] for x in game_states]
             nn_inputs = Trainer.format_batch(game_states)
             batch_q, rnn_state = self.train_model.predict(nn_inputs, rnn_state)
 
@@ -450,7 +451,7 @@ class Trainer:
             # choose best action among the heuristically allowed actions
             forbidden_choices = Trainer.heuristic_forbidden_choices(game)
             for action_id in forbidden_choices:
-                action_qs[action_id] = -99
+                action_qs[action_id] = -9
 
             best_q = max(action_qs[j] for j in range(game.n_actions) if game.is_valid_action[j])
             choices = [j for j in range(game.n_actions) if action_qs[j] == best_q]
@@ -459,15 +460,16 @@ class Trainer:
 
             print("Q vector:")
             fm1 = ' '.join(['%5d'] * len(action_qs))
-            fm2 = ' '.join(['%5.1f'] * len(action_qs))
-            print(fm2 % tuple(batch_q))
-            print(fm1 % tuple(range(len(batch_q))))
+            fm2 = ' '.join(['%5.2f'] * len(action_qs))
+            print(fm2 % tuple(action_qs))
+            print(fm1 % tuple(range(len(action_qs))))
 
             print("Chosen action is {}:".format(action_id))
-            display_action(action)
+            display_action(game, action)
 
             game.play(action)
             last_action = action_id
+            input()
 
     @staticmethod
     def checkpoint_file_name(iteration):
