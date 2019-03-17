@@ -154,7 +154,8 @@ class Trainer:
                     choices = [j for j in range(game.n_actions) if state_q[j] == best_q and game.is_valid_action[j]]
                 else:
                     # explore - choose a random action
-                    choices = [j for j in range(game.n_actions) if game.is_valid_action[j]]
+                    forbidden_choices = Trainer.heuristic_forbidden_choices(game)
+                    choices = [j for j in range(game.n_actions) if game.is_valid_action[j] and j not in forbidden_choices]
                 action_id = random.choice(choices)
                 action = game.actions[action_id]
                 game.play(action)
