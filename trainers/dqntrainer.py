@@ -164,7 +164,7 @@ class Trainer:
                     for action_id in forbidden_choices:
                         action_qs[action_id] = -128
                     best_q = max(action_qs[j] for j in range(game.n_actions) if game.is_valid_action[j])
-                    choices = [j for j in range(game.n_actions) if action_qs[j] == best_q]
+                    choices = [j for j in range(game.n_actions) if action_qs[j] == best_q and game.is_valid_action[j]]
                 else:
                     # explore - choose a random action
                     choices = [j for j in range(game.n_actions) if game.is_valid_action[j]]
@@ -454,7 +454,7 @@ class Trainer:
                 action_qs[action_id] = -9
 
             best_q = max(action_qs[j] for j in range(game.n_actions) if game.is_valid_action[j])
-            choices = [j for j in range(game.n_actions) if action_qs[j] == best_q]
+            choices = [j for j in range(game.n_actions) if action_qs[j] == best_q and game.is_valid_action[j]]
             action_id = random.choice(choices)
             action = game.actions[action_id]
 

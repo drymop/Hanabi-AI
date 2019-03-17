@@ -151,7 +151,7 @@ class Game(object):
         elif action.type == ActionType.HINT:
             self._process_hint(action)
         else:
-            raise ValueError("Expected action type to be 'PLAY', 'DISCARD' or 'HINT'; got '%r'".format(action.type))
+            raise ValueError("Expected action type to be 'PLAY', 'DISCARD' or 'HINT'; got '%r'" % action.type)
         
         # move to next player
         self.n_turns += 1
