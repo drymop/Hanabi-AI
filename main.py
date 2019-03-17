@@ -1,5 +1,5 @@
 from game import Game
-from trainers.dqntrainer import Trainer
+from trainers.dqntrainer_simple import Trainer
 from utils.attributedict import AttributeDict
 
 if __name__ == '__main__':
@@ -14,13 +14,15 @@ if __name__ == '__main__':
         hand_size=Game.HAND_SIZE_PER_N_PLAYERS[n_players],
     )
     model_configs = AttributeDict(
-        n_rnn_hiddens=64,
-        n_rnn_layers=1,
-        n_dense_before_rnn=1,
-        n_dense_after_rnn=1,
+        # n_rnn_hiddens=64,
+        # n_rnn_layers=1,
+        # n_dense_before_rnn=1,
+        # n_dense_after_rnn=1,
+        n_hiddens = [500],
         n_outputs=Game.ACTIONS_PER_N_PLAYERS[n_players],
         learn_rate=1e-4,
-        dropout_rate=0.3,
+        # dropout_rate=0.3,
+        dropout_rates=[0.4],
     )
     train_configs = AttributeDict(
         save_folder=save_folder,

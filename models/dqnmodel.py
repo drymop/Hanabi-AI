@@ -102,6 +102,7 @@ class Model(object):
             layer = concated_inputs
             for i in range(n_dense_before_rnn - 1):
                 layer = self._create_dense_layer(layer, 128, tf.nn.relu, dropout_rate, self.inputs.is_training)
+            # shape: batch_size, time_steps, n_rnn_hiddens
             rnn_inputs = tf.layers.dense(layer, n_rnn_hiddens, activation=tf.nn.leaky_relu,
                                          kernel_initializer=tf.contrib.layers.variance_scaling_initializer())
 
