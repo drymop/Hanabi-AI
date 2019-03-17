@@ -65,7 +65,7 @@ class Model(object):
             # flatten hands and hints
             hands_hints = tf.concat([one_hot_hands, self.inputs.game_state.hints], axis=1)
             shape = hands_hints.shape
-            hands_hints = tf.reshape(hands_hints, [-1, shape[2] * shape[3] * shape[4]])  # flatten
+            hands_hints = tf.reshape(hands_hints, [-1, shape[1] * shape[2] * shape[3]])  # flatten
 
             # subtract the seen tiles from other players
             remain_tiles = self.inputs.game_state.remain_tiles - tf.reduce_sum(one_hot_hands, axis=[1, 2])
@@ -165,7 +165,7 @@ class Model(object):
         :param game_states: batch of game states
         :return: StateFeatures where each feature is the combined feature of the batch
         """
-        return Model.StateFeatures(*zip(game_states))
+        return Model.StateFeatures(*zip(*game_states))
 
     def save_checkpoint(self, folder='checkpoint', filename='checkpoint.ckpt'):
         file_path = os.path.join(folder, filename)
