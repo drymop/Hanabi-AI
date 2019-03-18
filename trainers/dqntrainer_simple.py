@@ -124,6 +124,8 @@ class Trainer:
         # (aka the time series of player j of game i is stored at index (i*n_players + j)
         time_series = [[] for _ in range(batch_size)]
         games = [Game(n_players) for _ in range(n_games)]
+        for game in games:  # vary the number of fuse to start with
+            game.n_fuse_tokens = random.randrange(1, Game.MAX_FUSES+1)
         last_actions = [-1] * n_games
 
         while not all(g.is_over for g in games):
@@ -170,15 +172,16 @@ class Trainer:
 
     @staticmethod
     def heuristic_forbidden_choices(game):
-        non_playable = []
-        for j, tile in enumerate(game.hands[game.cur_player]):
-            if game.fireworks[tile.suit] == tile.rank \
-                    and game.hints[game.cur_player][j][0].count(True) == 1 \
-                    and game.hints[game.cur_player][j][1].count(True) == 1:
-                non_playable.append(game.hand_size + j)  # surely playable, should not discard
-            else:
-                non_playable.append(j)  # not surely playable, do not play
-        return non_playable
+        # non_playable = []
+        # for j, tile in enumerate(game.hands[game.cur_player]):
+        #     if game.fireworks[tile.suit] == tile.rank \
+        #             and game.hints[game.cur_player][j][0].count(True) == 1 \
+        #             and game.hints[game.cur_player][j][1].count(True) == 1:
+        #         non_playable.append(game.hand_size + j)  # surely playable, should not discard
+        #     else:
+        #         non_playable.append(j)  # not surely playable, do not play
+        # return non_playable
+        return []  # nothing is forbidden
 
     def play_random(self):
         """Play a game randomly and return the episode.
