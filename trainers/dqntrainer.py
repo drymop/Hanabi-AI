@@ -8,7 +8,7 @@ import time
 from game import Game
 from models.dqnmodel import Model
 from utils.consoledisplay import display_action, display_state
-from utils.expbuffer import Experience, ExperienceBuffer
+from utils.shitexpbuffer import Experience, ExperienceBuffer
 
 
 class Trainer:
@@ -28,7 +28,7 @@ class Trainer:
         batch_size = train_configs.batch_size
 
         # -------------------------
-        # models to train and experience buffer
+        # models to train and experience _buffer
 
         self.train_model = Model(game_configs, model_configs)
         # model used during training iteration while train_model is being updated
@@ -109,7 +109,7 @@ class Trainer:
 
     def get_train_batch(self, batch_size, time_steps):
         """Return an array of game states with shape (batch_size, time_steps), chosen randomly from the experience
-        buffer
+        _buffer
         """
         batch = self.experience_buffer.sample(batch_size)
         for i in range(batch_size):
@@ -330,17 +330,17 @@ class Trainer:
                       configs_file, indent=4)
 
         # -------------------------
-        # fill up the buffer
+        # fill up the _buffer
         print('==================================== FILLING BUFFER ===================================')
         avg_score = 0
         avg_eval = 0
         avg_turns = 0
-        n_random_games = self.train_configs.buffer_size // self.game_configs.n_players // 2  # fill half of the buffer
+        n_random_games = self.train_configs.buffer_size // self.game_configs.n_players // 2  # fill half of the _buffer
         # n_random_games = 1
 
         for i in range(n_random_games):
             game, time_series = self.play_random()
-            # add to buffer
+            # add to _buffer
             _eval = self.eval_game_state(time_series[0][-1])  # evaluation of the final state
             for time_series_a_player in time_series:
                 self.experience_buffer.add(Experience(_eval, time_series_a_player),
@@ -352,7 +352,7 @@ class Trainer:
             if ((i + 1) % 200) == 0:
                 games_played = i + 1
                 print('{} games played'.format(games_played))
-                print('buffer eval: {}'.format(self.experience_buffer.avgScore))
+                print('_buffer eval: {}'.format(self.experience_buffer.avgScore))
                 print('score: {}'.format(avg_score / games_played))
                 print('eval : {}'.format(avg_eval / games_played))
                 print('turn : {}'.format(avg_turns / games_played))
@@ -378,7 +378,7 @@ class Trainer:
 
             # create sample games by playing with exploration on
             games, batch_time_series = self.play_batch(n_sample_games, explore_rate=explore_rate, help_rate=help_rate)
-            # add sample games to experience buffer
+            # add sample games to experience _buffer
             sample_eval = 0
             for time_series in batch_time_series:
                 _eval = self.eval_game_state(time_series[-1])
@@ -390,11 +390,11 @@ class Trainer:
             sample_deaths = sum(Game.MAX_FUSES - game.n_fuse_tokens for game in games) / n_sample_games
             sample_turns = sum(game.n_turns for game in games) / n_sample_games
             print('\n{} sample games played'.format(n_sample_games))
-            print('buffer eval: {}\nsample score: {}\nsample eval: {}\nsample deaths: {}\nsample turns: {}'
+            print('_buffer eval: {}\nsample score: {}\nsample eval: {}\nsample deaths: {}\nsample turns: {}'
                   .format(self.experience_buffer.avgScore, sample_score, sample_eval, sample_deaths,
                           sample_turns))
 
-            # create validation games by playing with exploration off, these games are not added to experience buffer
+            # create validation games by playing with exploration off, these games are not added to experience _buffer
             games, batch_time_series = self.play_batch(n_validation_games, explore_rate=0, help_rate=0)
             # print statistics
             valid_score = sum(game.score for game in games) / n_validation_games

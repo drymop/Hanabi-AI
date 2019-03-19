@@ -4,16 +4,18 @@ import numpy as np
 import os
 import random
 import time
+from typing import List
 
 from game import Game
 from models.dqnmodel_simple import Model
 from utils.consoledisplay import display_action, display_state
-from utils.expbuffer import Experience, ExperienceBuffer
+from utils.weightedexpbuffer import Experience, ExperienceBuffer
 
 
 class Trainer:
 
     def __init__(self, game_configs, model_configs, train_configs):
+        # -------------------------
         # configs
         self.game_configs = game_configs
         self.model_configs = model_configs
@@ -25,7 +27,7 @@ class Trainer:
         batch_size = train_configs.batch_size
 
         # -------------------------
-        # models to train and experience buffer
+        # models to train and experience _buffer
 
         self.train_model = Model(game_configs, model_configs)
         # model used during training iteration while train_model is being updated
@@ -98,18 +100,6 @@ class Trainer:
             )
         return game_states
 
-    def get_train_batch(self, batch_size):
-        """Return an array of game states with shape (batch_size, time_steps), chosen randomly from the experience
-        buffer
-        """
-        batch = self.experience_buffer.sample(batch_size)
-        for i in range(batch_size):
-            # trim the series to time_steps steps
-            series = batch[i].experience
-            r = random.randrange(len(series) - 1)
-            batch[i] = series[r:r+2]
-        return batch
-
     def play_batch(self, n_games, explore_rate):
         """
         Play a batch of games using the train_model neural network to select move
@@ -125,7 +115,7 @@ class Trainer:
         time_series = [[] for _ in range(batch_size)]
         games = [Game(n_players) for _ in range(n_games)]
         for game in games:  # vary the number of fuse to start with
-            game.n_fuse_tokens = random.randrange(1, Game.MAX_FUSES+1)
+            game.n_fuse_tokens = random.randrange(1, Game.MAX_FUSES + 1)
         last_actions = [-1] * n_games
 
         while not all(g.is_over for g in games):
@@ -157,7 +147,8 @@ class Trainer:
                 else:
                     # explore - choose a random action
                     forbidden_choices = Trainer.heuristic_forbidden_choices(game)
-                    choices = [j for j in range(game.n_actions) if game.is_valid_action[j] and j not in forbidden_choices]
+                    choices = [j for j in range(game.n_actions) if
+                               game.is_valid_action[j] and j not in forbidden_choices]
                 action_id = random.choice(choices)
                 action = game.actions[action_id]
                 game.play(action)
@@ -228,31 +219,28 @@ class Trainer:
         avg_loss = 0
         for epoch in range(n_epochs):
             # get experiences
-            batch = self.get_train_batch(batch_size)  # batch has shape [batch_size, 2]
-
-            # reward from time i to i+1, for each row in batch:
-            rewards = [self.eval_game_state(x[1]) - self.eval_game_state(x[0]) for x in batch]
+            batch = self.experience_buffer.sample(batch_size)  # batch: list of experiences (state, next_state, reward)
 
             # Q values for each 2nd state from the batch, shape=(batch_size, n_actions)
-            next_states = [x[1] for x in batch]
+            next_states = [exp.next_state for exp in batch]
             next_q = self.target_model.predict(next_states)
 
             # target Q values = reward + discount * max(Q values of next state)
             target_q = np.zeros([batch_size, n_actions], float)
             for i in range(batch_size):
-                action_id = batch[i][1].last_action
-                target_q[i][action_id] = rewards[i] + discount_rate * max(next_q[i])
+                action_id = batch[i].next_state.last_action
+                target_q[i][action_id] = batch[i].reward + discount_rate * max(next_q[i])
 
             # mask the loss from action that is not taken at a step
             do_nothing_action_id = n_actions - 1
             loss_mask = np.empty(batch_size, np.int8)
             for i in range(batch_size):
-                if batch[i][0].cur_player == 0:  # is current player
-                    loss_mask[i] = batch[i][1].last_action
+                if batch[i].state.cur_player == 0:  # is current player
+                    loss_mask[i] = batch[i].next_state.last_action
                 else:
                     loss_mask[i] = do_nothing_action_id
 
-            cur_states = [x[0] for x in batch]
+            cur_states = [exp.state for exp in batch]
             # train
             loss = self.train_model.train(cur_states, target_q, loss_mask)
             avg_loss += loss
@@ -270,7 +258,7 @@ class Trainer:
 
         # file recording statistics during training
         with open(stats_file_path, 'a+') as stats_file:
-            stats_file.write('iter, explore_rate, buffer_eval, sample_score, sample_eval, sample_deaths, '
+            stats_file.write('iter, explore_rate, sample_score, sample_eval, sample_deaths, '
                              'sample_turns, valid_score, valid_eval, valid_deaths, valid_turns, loss, time\n')
 
         # file saving the configs
@@ -281,29 +269,26 @@ class Trainer:
                       configs_file, indent=4)
 
         # -------------------------
-        # fill up the buffer
+        # fill up the _buffer
         print('==================================== FILLING BUFFER ===================================')
         avg_score = 0
         avg_eval = 0
         avg_turns = 0
-        n_random_games = self.train_configs.buffer_size // self.game_configs.n_players // 2  # fill half of the buffer
+        n_random_games = self.train_configs.buffer_size // self.game_configs.n_players // 2  # fill half of the _buffer
         # n_random_games = 1
 
         for i in range(n_random_games):
             game, time_series = self.play_random()
-            # add to buffer
-            _eval = self.eval_game_state(time_series[0][-1])  # evaluation of the final state
-            for time_series_a_player in time_series:
-                self.experience_buffer.add(Experience(_eval, time_series_a_player),
-                                           weighted=self.train_configs.weighted_buffer)
+            # add to _buffer
+            for time_series_each_player in time_series:
+                self._add_experiences(time_series_each_player)
             # update average
             avg_score += game.score
-            avg_eval += _eval
+            avg_eval += self.eval_game_state(time_series[0][-1])  # evaluation of the final state
             avg_turns += game.n_turns
             if ((i + 1) % 200) == 0:
                 games_played = i + 1
                 print('{} games played'.format(games_played))
-                print('buffer eval: {}'.format(self.experience_buffer.avgScore))
                 print('score: {}'.format(avg_score / games_played))
                 print('eval : {}'.format(avg_eval / games_played))
                 print('turn : {}'.format(avg_turns / games_played))
@@ -326,23 +311,25 @@ class Trainer:
 
             # create sample games by playing with exploration on
             games, batch_time_series = self.play_batch(n_sample_games, explore_rate=explore_rate)
-            # add sample games to experience buffer
+            # add sample games to experience _buffer
             sample_eval = 0
             for time_series in batch_time_series:
-                _eval = self.eval_game_state(time_series[-1])
-                sample_eval += _eval
-                self.experience_buffer.add(Experience(_eval, time_series), weighted=self.train_configs.weighted_buffer)
+                # keep track of average game eval
+                sample_eval += self.eval_game_state(time_series[-1])  # final state evaluation
+
+                # save experiences to buffer
+                self._add_experiences(time_series)
+
             # print statistics
             sample_score = sum(game.score for game in games) / n_sample_games
             sample_eval = sample_eval / len(batch_time_series)
             sample_deaths = sum(Game.MAX_FUSES - game.n_fuse_tokens for game in games) / n_sample_games
             sample_turns = sum(game.n_turns for game in games) / n_sample_games
             print('\n{} sample games played'.format(n_sample_games))
-            print('buffer eval: {}\nsample score: {}\nsample eval: {}\nsample deaths: {}\nsample turns: {}'
-                  .format(self.experience_buffer.avgScore, sample_score, sample_eval, sample_deaths,
-                          sample_turns))
+            print('sample score: {}\nsample eval: {}\nsample deaths: {}\nsample turns: {}'
+                  .format(sample_score, sample_eval, sample_deaths, sample_turns))
 
-            # create validation games by playing with exploration off, these games are not added to experience buffer
+            # create validation games by playing with exploration off, these games are not added to experience _buffer
             games, batch_time_series = self.play_batch(n_validation_games, explore_rate=0)
             # print statistics
             valid_score = sum(game.score for game in games) / n_validation_games
@@ -362,7 +349,7 @@ class Trainer:
             print('time: {}'.format(iter_total_time))
             # log stuff to stat file
             with open(stats_file_path, 'a+') as stats_file:
-                stats = [it, explore_rate, self.experience_buffer.avgScore,
+                stats = [it, explore_rate,
                          sample_score, sample_eval, sample_deaths, sample_turns,
                          valid_score, valid_eval, valid_deaths, valid_turns,
                          loss, iter_total_time]
@@ -377,6 +364,13 @@ class Trainer:
         # return sum(self.firework_eval[x] for x in game_state.fireworks) \
         #        - self.fuse_eval[Game.MAX_FUSES - game_state.n_fuse_tokens]
         # return sum(game_state.fireworks) / (Game.MAX_FUSES + 1 - game_state.n_fuse_tokens)
+
+    def _add_experiences(self, time_series: List[Model.StateFeatures]):
+        _state_values = [self.eval_game_state(state) for state in time_series]
+        for i in range(len(time_series) - 1):
+            exp = Experience(state=time_series[i], next_state=time_series[i + 1],
+                             reward=_state_values[i + 1] - _state_values[i])
+            self.experience_buffer.add(exp)
 
     def test(self):
         n_players = self.game_configs.n_players

@@ -17,9 +17,9 @@ class ExperienceBuffer:
 
     def add(self, experience, weighted=False):
         '''
-        Add the experience to buffer
+        Add the experience to _buffer
         experience: Experience-like object
-        weighted: add multiple copies if experience's score is higher than average score in buffer
+        weighted: add multiple copies if experience's score is higher than average score in _buffer
         '''
         if weighted:
             nInsert = max(experience.score-self.avgScore+0.9, 1) ** 2
