@@ -30,84 +30,85 @@ class Model(object):
         hand_size = game_configs.hand_size
 
         self.graph = tf.Graph()
-        with self.graph.as_default():
-            # -------------------------
-            # Input placeholders
+        with tf.device('/device:GPU:2'):
+            with self.graph.as_default():
+                # -------------------------
+                # Input placeholders
 
-            with tf.variable_scope('inputs'):
-                self.inputs = namedtuple('InputHeads', 'game_state loss_mask targets is_training')(
-                    game_state=Model.StateFeatures(
-                        cur_player=tf.placeholder(tf.int32, shape=[None], name='cur_player'),
-                        remain_tiles=tf.placeholder(tf.float32, shape=[None, n_tile_types], name='remain_tiles'),
-                        hands=tf.placeholder(tf.int32, shape=[None, n_players - 1, hand_size], name='hands'),
-                        hints=tf.placeholder(tf.float32, shape=[None, n_players, hand_size, n_tile_types],
-                                             name='hints'),
-                        n_hint_tokens=tf.placeholder(tf.float32, shape=[None], name='n_hint_tokens'),
-                        n_fuse_tokens=tf.placeholder(tf.float32, shape=[None], name='n_fuse_tokens'),
-                        fireworks=tf.placeholder(tf.int32, shape=[None, n_suits], name='fireworks'),
-                        valid_mask=tf.placeholder(tf.float32, shape=[None, n_outputs], name='valid_mask'),
-                        last_action=tf.placeholder(tf.int32, shape=[None], name='last_action'),
-                    ),
-                    loss_mask=tf.placeholder(tf.int32, shape=[None], name='loss_mask'),
-                    targets=tf.placeholder(tf.float32, shape=[None, n_outputs], name='targets'),
-                    is_training=tf.placeholder(tf.bool, shape=(), name='is_training')
-                )
-            # -------------------------
-            # Pre-process input heads into 1 large input array:
-            batch_size = tf.shape(self.inputs.game_state.cur_player)[0]
+                with tf.variable_scope('inputs'):
+                    self.inputs = namedtuple('InputHeads', 'game_state loss_mask targets is_training')(
+                        game_state=Model.StateFeatures(
+                            cur_player=tf.placeholder(tf.int32, shape=[None], name='cur_player'),
+                            remain_tiles=tf.placeholder(tf.float32, shape=[None, n_tile_types], name='remain_tiles'),
+                            hands=tf.placeholder(tf.int32, shape=[None, n_players - 1, hand_size], name='hands'),
+                            hints=tf.placeholder(tf.float32, shape=[None, n_players, hand_size, n_tile_types],
+                                                 name='hints'),
+                            n_hint_tokens=tf.placeholder(tf.float32, shape=[None], name='n_hint_tokens'),
+                            n_fuse_tokens=tf.placeholder(tf.float32, shape=[None], name='n_fuse_tokens'),
+                            fireworks=tf.placeholder(tf.int32, shape=[None, n_suits], name='fireworks'),
+                            valid_mask=tf.placeholder(tf.float32, shape=[None, n_outputs], name='valid_mask'),
+                            last_action=tf.placeholder(tf.int32, shape=[None], name='last_action'),
+                        ),
+                        loss_mask=tf.placeholder(tf.int32, shape=[None], name='loss_mask'),
+                        targets=tf.placeholder(tf.float32, shape=[None, n_outputs], name='targets'),
+                        is_training=tf.placeholder(tf.bool, shape=(), name='is_training')
+                    )
+                # -------------------------
+                # Pre-process input heads into 1 large input array:
+                batch_size = tf.shape(self.inputs.game_state.cur_player)[0]
 
-            # Create one_hot vectors for current player's number
-            one_hot_cur_player = tf.one_hot(self.inputs.game_state.cur_player, n_players)
+                # Create one_hot vectors for current player's number
+                one_hot_cur_player = tf.one_hot(self.inputs.game_state.cur_player, n_players)
 
-            # Create one_hot vectors for hands
-            one_hot_hands = tf.one_hot(self.inputs.game_state.hands, n_tile_types)
+                # Create one_hot vectors for hands
+                one_hot_hands = tf.one_hot(self.inputs.game_state.hands, n_tile_types)
 
-            # flatten hands and hints
-            hands_hints = tf.concat([one_hot_hands, self.inputs.game_state.hints], axis=1)
-            shape = hands_hints.shape
-            hands_hints = tf.reshape(hands_hints, [-1, shape[1] * shape[2] * shape[3]])  # flatten
+                # flatten hands and hints
+                hands_hints = tf.concat([one_hot_hands, self.inputs.game_state.hints], axis=1)
+                shape = hands_hints.shape
+                hands_hints = tf.reshape(hands_hints, [-1, shape[1] * shape[2] * shape[3]])  # flatten
 
-            # subtract the seen tiles from other players
-            remain_tiles = self.inputs.game_state.remain_tiles - tf.reduce_sum(one_hot_hands, axis=[1, 2])
+                # subtract the seen tiles from other players
+                remain_tiles = self.inputs.game_state.remain_tiles - tf.reduce_sum(one_hot_hands, axis=[1, 2])
 
-            # reshape n_hint_tokens and n_fuse_tokens from float to array of 1 element
-            n_hint_tokens = tf.reshape(self.inputs.game_state.n_hint_tokens, [batch_size, 1])
-            n_fuse_tokens = tf.reshape(self.inputs.game_state.n_fuse_tokens, [batch_size, 1])
-            # shape: [batch_size, n_ranks, n_suits]
-            one_hot_fireworks = tf.one_hot(self.inputs.game_state.fireworks, n_ranks, axis=1)
-            one_hot_fireworks = tf.reshape(one_hot_fireworks, [batch_size, n_tile_types])
+                # reshape n_hint_tokens and n_fuse_tokens from float to array of 1 element
+                n_hint_tokens = tf.reshape(self.inputs.game_state.n_hint_tokens, [batch_size, 1])
+                n_fuse_tokens = tf.reshape(self.inputs.game_state.n_fuse_tokens, [batch_size, 1])
+                # shape: [batch_size, n_ranks, n_suits]
+                one_hot_fireworks = tf.one_hot(self.inputs.game_state.fireworks, n_ranks, axis=1)
+                one_hot_fireworks = tf.reshape(one_hot_fireworks, [batch_size, n_tile_types])
 
-            # one hot vector for last action
-            one_hot_last_actions = tf.one_hot(self.inputs.game_state.last_action, n_outputs - 1)
+                # one hot vector for last action
+                one_hot_last_actions = tf.one_hot(self.inputs.game_state.last_action, n_outputs - 1)
 
-            # Processed input concat into a 2D array (batch_size x num_features)
-            concated_inputs = tf.concat(
-                [one_hot_cur_player, remain_tiles, hands_hints, one_hot_fireworks, n_hint_tokens, n_fuse_tokens,
-                 one_hot_last_actions], axis=-1)
+                # Processed input concat into a 2D array (batch_size x num_features)
+                concated_inputs = tf.concat(
+                    [one_hot_cur_player, remain_tiles, hands_hints, one_hot_fireworks, n_hint_tokens, n_fuse_tokens,
+                     one_hot_last_actions], axis=-1)
 
-            # -------------------------
-            # hidden layers (fully connected RELU)
-            cur_layer = concated_inputs
-            for n_hidden, dropout_rate in zip(n_hiddens, dropout_rates):  # for each hidden layer
-                cur_layer = self._create_dense_layer(cur_layer, n_hidden, tf.nn.relu,
-                                                     dropout_rate, self.inputs.is_training)
+                # -------------------------
+                # hidden layers (fully connected RELU)
+                cur_layer = concated_inputs
+                for n_hidden, dropout_rate in zip(n_hiddens, dropout_rates):  # for each hidden layer
+                    cur_layer = self._create_dense_layer(cur_layer, n_hidden, tf.nn.relu,
+                                                         dropout_rate, self.inputs.is_training)
 
-            # -------------------------
-            # output layer (fully connected, linear activation), masked by valid_mask input
-            cur_layer = tf.layers.dense(cur_layer, n_outputs)
-            self.outputs = tf.multiply(cur_layer, self.inputs.game_state.valid_mask)
+                # -------------------------
+                # output layer (fully connected, linear activation), masked by valid_mask input
+                cur_layer = tf.layers.dense(cur_layer, n_outputs)
+                self.outputs = tf.multiply(cur_layer, self.inputs.game_state.valid_mask)
 
-            # -------------------------
-            # Back propagation layer
-            one_hot_loss_mask = tf.one_hot(self.inputs.loss_mask, n_outputs)
+                # -------------------------
+                # Back propagation layer
+                one_hot_loss_mask = tf.one_hot(self.inputs.loss_mask, n_outputs)
 
-            self.loss = tf.losses.mean_squared_error(self.inputs.targets,
-                                                     self.outputs,
-                                                     weights=one_hot_loss_mask)
+                self.loss = tf.losses.mean_squared_error(self.inputs.targets,
+                                                         self.outputs,
+                                                         weights=one_hot_loss_mask)
 
-            update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-            with tf.control_dependencies(update_ops):
-                self.train_step = tf.train.AdamOptimizer(learn_rate).minimize(self.loss)
+                update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+                with tf.control_dependencies(update_ops):
+                    self.train_step = tf.train.AdamOptimizer(learn_rate).minimize(self.loss)
 
         # ---------------------------------
         # Initialize graph

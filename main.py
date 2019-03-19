@@ -36,7 +36,7 @@ if __name__ == '__main__':
         n_epochs_per_iter=16,
         explore_rate=(1, 0.1, 0.01),
         # help_rate=(0, 0, 0),
-        discount_rate=0.9,
+        discount_rate=0.95,
         firework_eval=(1,0.5),
         fuse_eval=(0, 0),
     )
