@@ -33,7 +33,7 @@ class Trainer:
         # model used during training iteration while train_model is being updated
         self.target_model = Model(game_configs, model_configs)
 
-        self.experience_buffer = ExperienceBuffer(self.train_configs.buffer_size)
+        self.experience_buffer = ExperienceBuffer(self.train_configs.buffer_size, self.train_configs.buffer_prob_scale)
 
         # -------------------------
         # Precomputed neural network's inputs
@@ -217,6 +217,8 @@ class Trainer:
 
         # train for some epochs
         avg_loss = 0
+        avg_reward = 0
+        avg_abs_reward = 0
         for epoch in range(n_epochs):
             # get experiences
             batch = self.experience_buffer.sample(batch_size)  # batch: list of experiences (state, next_state, reward)
@@ -244,6 +246,10 @@ class Trainer:
             # train
             loss = self.train_model.train(cur_states, target_q, loss_mask)
             avg_loss += loss
+            avg_reward += sum(exp.reward for exp in batch) / batch_size
+            avg_abs_reward += sum(abs(exp.reward) for exp in batch) / batch_size
+        print('avg rewards: {}'.format(avg_reward / n_epochs))
+        print('avg abs rewards: {}'.format(avg_abs_reward / n_epochs))
         return avg_loss / n_epochs
 
     def start_training(self):
@@ -360,9 +366,9 @@ class Trainer:
             explore_rate = max(explore_rate - explore_rate_decrease, explore_rate_end)
 
     def eval_game_state(self, game_state):
-        return sum(self.firework_eval[x] for x in game_state.fireworks)
-        # return sum(self.firework_eval[x] for x in game_state.fireworks) \
-        #        - self.fuse_eval[Game.MAX_FUSES - game_state.n_fuse_tokens]
+        # return sum(self.firework_eval[x] for x in game_state.fireworks)
+        return sum(self.firework_eval[x] for x in game_state.fireworks) \
+               - self.fuse_eval[Game.MAX_FUSES - game_state.n_fuse_tokens]
         # return sum(game_state.fireworks) / (Game.MAX_FUSES + 1 - game_state.n_fuse_tokens)
 
     def _add_experiences(self, time_series: List[Model.StateFeatures]):
@@ -410,13 +416,3 @@ class Trainer:
     @staticmethod
     def checkpoint_file_name(iteration):
         return str(iteration) + '.ckpt'
-
-    @staticmethod
-    def format_batch(time_series_batch):
-        """
-        Create a batch from a list of time series, each time series is a list of States
-        (aka a 2D array of game states, shape=[batch_size x time_steps])
-        The resulting batch collects each feature of game state in a 2D array of shape [batch_size x time_steps],
-        where element[i][j] is the feature of State at batch i, time j
-        """
-        return Model.StateFeatures(*zip(*(zip(*s) for s in time_series_batch)))

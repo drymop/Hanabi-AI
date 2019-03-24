@@ -27,6 +27,7 @@ if __name__ == '__main__':
     train_configs = AttributeDict(
         save_folder=save_folder,
         buffer_size=16384,
+        buffer_prob_scale=5,
         # weighted_buffer=True,
         n_games_per_iter=512,
         n_validation_games_per_iter=128,
@@ -34,11 +35,11 @@ if __name__ == '__main__':
         batch_size=128,
         # time_steps=8,
         n_epochs_per_iter=16,
-        explore_rate=(1, 0.1, 0.01),
+        explore_rate=(1, 0.1, 0.001),
         # help_rate=(0, 0, 0),
         discount_rate=0.95,
         firework_eval=(1,0.5),
-        fuse_eval=(0, 0),
+        fuse_eval=(0.3, 0.1),
     )
 
     trainer = Trainer(game_configs, model_configs, train_configs)

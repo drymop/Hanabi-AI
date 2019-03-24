@@ -10,13 +10,14 @@ class Experience:
 
 
 class ExperienceBuffer:
-    def __init__(self, max_len: int):
+    def __init__(self, max_len: int, buffer_prob_scale: float):
         self.max_len = max_len
         self._buffer = [None] * self.max_len  # type: List[Experience]
         self.len = 0
         self._insert_index = 0  # type: int
         self._unnormalized_prob = np.zeros(
             self.max_len)  # proportional to the probability that an experience in sampled
+        self._buffer_prob_scale = buffer_prob_scale
 
     def __len__(self):
         return self.len
@@ -28,7 +29,7 @@ class ExperienceBuffer:
         self._insert_index = (self._insert_index + 1) % self.max_len
 
     def _calculate_unnormalized_probability(self, reward):
-        return abs(reward) * 10 + 1
+        return abs(reward) * self._buffer_prob_scale + 1
 
     def sample(self, size: int = 1) -> List[Experience]:
         normalized_prob = self._unnormalized_prob / sum(self._unnormalized_prob)
