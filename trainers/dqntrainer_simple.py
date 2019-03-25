@@ -114,8 +114,8 @@ class Trainer:
         # (aka the time series of player j of game i is stored at index (i*n_players + j)
         time_series = [[] for _ in range(batch_size)]
         games = [Game(n_players) for _ in range(n_games)]
-        for game in games:  # vary the number of fuse to start with
-            game.n_fuse_tokens = random.randrange(1, Game.MAX_FUSES + 1)
+        # for game in games:  # vary the number of fuse to start with
+        #     game.n_fuse_tokens = random.randrange(1, Game.MAX_FUSES + 1)
         last_actions = [-1] * n_games
 
         while not all(g.is_over for g in games):
@@ -368,7 +368,8 @@ class Trainer:
     def eval_game_state(self, game_state):
         # return sum(self.firework_eval[x] for x in game_state.fireworks)
         return sum(self.firework_eval[x] for x in game_state.fireworks) \
-               - self.fuse_eval[Game.MAX_FUSES - game_state.n_fuse_tokens]
+               - self.fuse_eval[Game.MAX_FUSES - game_state.n_fuse_tokens] \
+               + self.train_configs.hint_eval * (1 - np.mean(game_state.hints))
         # return sum(game_state.fireworks) / (Game.MAX_FUSES + 1 - game_state.n_fuse_tokens)
 
     def _add_experiences(self, time_series: List[Model.StateFeatures]):

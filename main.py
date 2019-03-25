@@ -18,7 +18,7 @@ if __name__ == '__main__':
         # n_rnn_layers=1,
         # n_dense_before_rnn=1,
         # n_dense_after_rnn=1,
-        n_hiddens = [500, 300],
+        n_hiddens=[500, 300],
         n_outputs=Game.ACTIONS_PER_N_PLAYERS[n_players],
         learn_rate=1e-4,
         # dropout_rate=0.3,
@@ -34,12 +34,13 @@ if __name__ == '__main__':
         update_target_model_every_n_iter=10,
         batch_size=128,
         # time_steps=8,
-        n_epochs_per_iter=16,
+        n_epochs_per_iter=128,
         explore_rate=(1, 0.1, 0.001),
         # help_rate=(0, 0, 0),
         discount_rate=0.95,
-        firework_eval=(1,0.5),
+        firework_eval=(1, 0.5),
         fuse_eval=(0.3, 0.1),
+        hint_eval=5,
     )
 
     trainer = Trainer(game_configs, model_configs, train_configs)

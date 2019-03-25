@@ -28,7 +28,7 @@ class Game(object):
     N_SUITS = len(SUITS)
     MAX_SCORE = N_SUITS * N_RANKS
     MAX_HINTS = 8
-    MAX_FUSES = 15
+    MAX_FUSES = 10
 
     # list of all unique tile types (= RANKS x SUITS)
     # to translate between tile type and tile index, the formula is
@@ -133,11 +133,11 @@ class Game(object):
         for i in range(1, self.n_players):
             p = (self.cur_player + i) % self.n_players
             hand = self.hands[p]
-            has_rank = [0] * Game.N_RANKS
-            has_suit = [0] * Game.N_SUITS
+            has_rank = [False] * Game.N_RANKS
+            has_suit = [False] * Game.N_SUITS
             for tile in hand:
-                has_rank[tile.rank] = 1
-                has_suit[tile.suit] = 1
+                has_rank[tile.rank] = True
+                has_suit[tile.suit] = True
             self.is_valid_action[act_ind:act_ind + Game.N_RANKS] = has_rank
             act_ind += Game.N_RANKS
             self.is_valid_action[act_ind:act_ind + Game.N_SUITS] = has_suit

@@ -1,0 +1,43 @@
+{
+    "model_configs": {
+        "learn_rate": 0.0001,
+        "n_outputs": 31,
+        "dropout_rates": [
+            0.3,
+            0.3
+        ],
+        "n_hiddens": [
+            500,
+            300
+        ]
+    },
+    "train_configs": {
+        "batch_size": 128,
+        "buffer_prob_scale": 5,
+        "firework_eval": [
+            1,
+            0.5
+        ],
+        "n_validation_games_per_iter": 128,
+        "buffer_size": 16384,
+        "explore_rate": [
+            1,
+            0.1,
+            0.001
+        ],
+        "discount_rate": 0.95,
+        "fuse_eval": [
+            0.3,
+            0.1
+        ],
+        "update_target_model_every_n_iter": 10,
+        "n_epochs_per_iter": 16,
+        "n_games_per_iter": 512
+    },
+    "game_configs": {
+        "n_suits": 5,
+        "n_players": 3,
+        "n_ranks": 5,
+        "hand_size": 5
+    }
+}
