@@ -8,7 +8,7 @@ import time
 from typing import List, Tuple
 
 from game import Game
-from models.policygradientmodel_simple import Model
+from models.policygradientmodel import Model
 from utils.consoledisplay import display_action, display_state
 
 

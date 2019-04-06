@@ -40,7 +40,7 @@ class Game(object):
     N_TILES_PER_RANK = (3, 2, 2, 2, 1)
     # e.g if there are 4 players, hand size = HAND_SIZE_PER_N_PLAYERS[4] = 4
     HAND_SIZE_PER_N_PLAYERS = (None, None, 5, 5, 4, 4)
-    ACTIONS_PER_N_PLAYERS = (None, None, -1, 31, -1, -1)
+    ACTIONS_PER_N_PLAYERS = (None, None, None, 31, None, None)
 
     def __init__(self, n_players):
         # keep count of each tile type

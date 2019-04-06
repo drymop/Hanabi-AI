@@ -1,10 +1,11 @@
 from collections import namedtuple
 import os
 import tensorflow as tf
+from typing import List
 
 
 class Model(object):
-    """DQN model that takes in a sequence of Hanabi game states and output the Q value of each action"""
+    """DQN model that takes in a Hanabi game state and output the Q value of each action, without any RNN"""
 
     # STATE_FEATURES = ['cur_player', 'remain_tiles', 'hands', 'hints',
     #                   'n_hint_tokens', 'n_fuse_tokens', 'fire_work', 'last_action', 'valid_mask']
@@ -17,13 +18,10 @@ class Model(object):
         self.game_configs = game_configs
 
         # model configs
-        n_rnn_hiddens = model_configs.n_rnn_hiddens
-        n_rnn_layers = model_configs.n_rnn_layers
-        n_dense_after_rnn = model_configs.n_dense_after_rnn
-        n_dense_before_rnn = model_configs.n_dense_before_rnn
+        n_hiddens = model_configs.n_hiddens
         n_outputs = model_configs.n_outputs
         learn_rate = model_configs.learn_rate
-        dropout_rate = model_configs.dropout_rate
+        dropout_rates = model_configs.dropout_rates
         # game configs
         n_ranks = game_configs.n_ranks
         n_suits = game_configs.n_suits
@@ -37,31 +35,26 @@ class Model(object):
             # Input placeholders
 
             with tf.variable_scope('inputs'):
-                self.inputs = namedtuple('InputHeads', 'game_state rnn_init_state loss_mask targets is_training')(
+                self.inputs = namedtuple('InputHeads', 'game_state loss_mask targets is_training')(
                     game_state=Model.StateFeatures(
-                        cur_player=tf.placeholder(tf.int32, shape=[None, None], name='cur_player'),
-                        remain_tiles=tf.placeholder(tf.float32, shape=[None, None, n_tile_types], name='remain_tiles'),
-                        hands=tf.placeholder(tf.int32, shape=[None, None, n_players - 1, hand_size], name='hands'),
-                        hints=tf.placeholder(tf.float32, shape=[None, None, n_players, hand_size, n_tile_types],
+                        cur_player=tf.placeholder(tf.int32, shape=[None], name='cur_player'),
+                        remain_tiles=tf.placeholder(tf.float32, shape=[None, n_tile_types], name='remain_tiles'),
+                        hands=tf.placeholder(tf.int32, shape=[None, n_players - 1, hand_size], name='hands'),
+                        hints=tf.placeholder(tf.float32, shape=[None, n_players, hand_size, n_tile_types],
                                              name='hints'),
-                        n_hint_tokens=tf.placeholder(tf.float32, shape=[None, None], name='n_hint_tokens'),
-                        n_fuse_tokens=tf.placeholder(tf.float32, shape=[None, None], name='n_fuse_tokens'),
-                        fireworks=tf.placeholder(tf.int32, shape=[None, None, n_suits], name='fireworks'),
-                        valid_mask=tf.placeholder(tf.float32, shape=[None, None, n_outputs], name='valid_mask'),
-                        last_action=tf.placeholder(tf.int32, shape=[None, None], name='last_action'),
+                        n_hint_tokens=tf.placeholder(tf.float32, shape=[None], name='n_hint_tokens'),
+                        n_fuse_tokens=tf.placeholder(tf.float32, shape=[None], name='n_fuse_tokens'),
+                        fireworks=tf.placeholder(tf.int32, shape=[None, n_suits], name='fireworks'),
+                        valid_mask=tf.placeholder(tf.float32, shape=[None, n_outputs], name='valid_mask'),
+                        last_action=tf.placeholder(tf.int32, shape=[None], name='last_action'),
                     ),
-                    rnn_init_state=tf.placeholder(tf.float32,
-                                                  shape=[n_rnn_layers, 2, None, n_rnn_hiddens],
-                                                  name='rnn_init_state'),
-                    loss_mask=tf.placeholder(tf.int32, shape=[None, None], name='loss_mask'),
-                    targets=tf.placeholder(tf.float32, shape=[None, None, n_outputs], name='targets'),
+                    loss_mask=tf.placeholder(tf.int32, shape=[None], name='loss_mask'),
+                    targets=tf.placeholder(tf.float32, shape=[None, n_outputs], name='targets'),
                     is_training=tf.placeholder(tf.bool, shape=(), name='is_training')
                 )
             # -------------------------
             # Pre-process input heads into 1 large input array:
-            shape = tf.shape(self.inputs.game_state.cur_player)
-            batch_size = shape[0]
-            time_steps = shape[1]
+            batch_size = tf.shape(self.inputs.game_state.cur_player)[0]
 
             # Create one_hot vectors for current player's number
             one_hot_cur_player = tf.one_hot(self.inputs.game_state.cur_player, n_players)
@@ -70,24 +63,19 @@ class Model(object):
             one_hot_hands = tf.one_hot(self.inputs.game_state.hands, n_tile_types)
 
             # flatten hands and hints
-            hands_hints = tf.concat([one_hot_hands, self.inputs.game_state.hints], axis=2)
+            hands_hints = tf.concat([one_hot_hands, self.inputs.game_state.hints], axis=1)
             shape = hands_hints.shape
-            hands_hints = tf.reshape(hands_hints, [-1, time_steps, shape[2] * shape[3] * shape[4]])  # flatten
+            hands_hints = tf.reshape(hands_hints, [-1, shape[1] * shape[2] * shape[3]])  # flatten
 
             # subtract the seen tiles from other players
-            remain_tiles = self.inputs.game_state.remain_tiles - tf.reduce_sum(one_hot_hands, axis=[2, 3])
-
-            # normalize integral quantities into (0, 1) range
-            # remain_tiles = tf.scalar_mul(tf.constant(1/MAX_N_PER_TYPES), remain_tiles)
-            # n_hint_tokens  = tf.scalar_mul(tf.constant(1/MAX_HINT_TOKENS), self.inputs.game_state.n_hint_tokens)
-            # n_fuse_tokens  = tf.scalar_mul(tf.constant(1/MAX_FUSE_TOKENS), self.inputs.game_state.n_fuse_tokens)
+            remain_tiles = self.inputs.game_state.remain_tiles - tf.reduce_sum(one_hot_hands, axis=[1, 2])
 
             # reshape n_hint_tokens and n_fuse_tokens from float to array of 1 element
-            n_hint_tokens = tf.reshape(self.inputs.game_state.n_hint_tokens, [batch_size, time_steps, 1])
-            n_fuse_tokens = tf.reshape(self.inputs.game_state.n_fuse_tokens, [batch_size, time_steps, 1])
-            # shape: [batch_size, time_steps, n_ranks, n_suits]
-            one_hot_fireworks = tf.one_hot(self.inputs.game_state.fireworks, n_ranks, axis=2)
-            one_hot_fireworks = tf.reshape(one_hot_fireworks, [batch_size, time_steps, n_tile_types])
+            n_hint_tokens = tf.reshape(self.inputs.game_state.n_hint_tokens, [batch_size, 1])
+            n_fuse_tokens = tf.reshape(self.inputs.game_state.n_fuse_tokens, [batch_size, 1])
+            # shape: [batch_size, n_ranks, n_suits]
+            one_hot_fireworks = tf.one_hot(self.inputs.game_state.fireworks, n_ranks, axis=1)
+            one_hot_fireworks = tf.reshape(one_hot_fireworks, [batch_size, n_tile_types])
 
             # one hot vector for last action
             one_hot_last_actions = tf.one_hot(self.inputs.game_state.last_action, n_outputs - 1)
@@ -98,35 +86,16 @@ class Model(object):
                  one_hot_last_actions], axis=-1)
 
             # -------------------------
-            # compress the sparse input through dense layers
-            layer = concated_inputs
-            for i in range(n_dense_before_rnn - 1):
-                layer = self._create_dense_layer(layer, 128, tf.nn.relu, dropout_rate, self.inputs.is_training)
-            # shape: batch_size, time_steps, n_rnn_hiddens
-            rnn_inputs = tf.layers.dense(layer, n_rnn_hiddens, activation=tf.nn.leaky_relu,
-                                         kernel_initializer=tf.contrib.layers.variance_scaling_initializer())
+            # hidden layers (fully connected RELU)
+            cur_layer = concated_inputs
+            for n_hidden, dropout_rate in zip(n_hiddens, dropout_rates):  # for each hidden layer
+                cur_layer = self._create_dense_layer(cur_layer, n_hidden, tf.nn.relu,
+                                                     dropout_rate, self.inputs.is_training)
 
             # -------------------------
-            # Recurrent layer
-            rnn_cells = [tf.nn.rnn_cell.LSTMCell(n_rnn_hiddens, forget_bias=1.0, activation=tf.nn.leaky_relu,
-                                                 state_is_tuple=True)
-                         for _ in range(n_rnn_layers)]
-            self.rnn_cell = tf.nn.rnn_cell.MultiRNNCell(rnn_cells, state_is_tuple=True)
-
-            unstacked_states = tf.unstack(self.inputs.rnn_init_state)  # for each layer
-            initial_state_tuple = tuple(tf.nn.rnn_cell.LSTMStateTuple(*tf.unstack(state)) for state in unstacked_states)
-
-            rnn_outputs, self.rnn_state = tf.nn.dynamic_rnn(self.rnn_cell, rnn_inputs,
-                                                            initial_state=initial_state_tuple)
-
-            # -------------------------
-            # Compress rnn output through multiple dense layer to get the final result
-            layer = rnn_outputs
-            for i in range(n_dense_after_rnn - 1):
-                layer = self._create_dense_layer(layer, 64, tf.nn.leaky_relu, dropout_rate, self.inputs.is_training)
-            dense = tf.layers.dense(layer, n_outputs, activation=tf.nn.leaky_relu,
-                                    kernel_initializer=tf.contrib.layers.variance_scaling_initializer())
-            self.outputs = tf.multiply(dense, self.inputs.game_state.valid_mask)
+            # output layer (fully connected, linear activation), masked by valid_mask input
+            cur_layer = tf.layers.dense(cur_layer, n_outputs)
+            self.outputs = tf.multiply(cur_layer, self.inputs.game_state.valid_mask)
 
             # -------------------------
             # Back propagation layer
@@ -135,9 +104,6 @@ class Model(object):
             self.loss = tf.losses.mean_squared_error(self.inputs.targets,
                                                      self.outputs,
                                                      weights=one_hot_loss_mask)
-
-            # unmasked_loss = tf.nn.softmax_cross_entropy_with_logits_v2(targets=self.targets, logits=outputs)
-            # self.loss = tf.reduce_mean(tf.boolean_mask(unmasked_loss, self.loss_mask))
 
             update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
             with tf.control_dependencies(update_ops):
@@ -165,30 +131,41 @@ class Model(object):
             return batch_norm
         return tf.layers.dropout(batch_norm, rate=dropout_rate, training=is_training)
 
-    def predict(self, games, rnn_init_state):
+    def predict(self, game_states: List[StateFeatures]) -> List[List[float]]:
         """
-        Give the predicted Q values of a batch of game
+        Give the predicted Q values of a batch of states
+        :param game_states:
+        :return:
         """
-        input_dict = {tensor: value for tensor, value in zip(self.inputs.game_state, games)}
-        input_dict[self.inputs.rnn_init_state] = rnn_init_state
+        game_states = Model.format_input_heads(game_states)
+        input_dict = {tensor: value for tensor, value in zip(self.inputs.game_state, game_states)}
         input_dict[self.inputs.is_training] = False
-        q_values, rnn_state = self.sess.run([self.outputs, self.rnn_state], feed_dict=input_dict)
+        q_values = self.sess.run(self.outputs, feed_dict=input_dict)
+        return q_values
 
-        return q_values, rnn_state
-
-    def train(self, games, rnn_init_state, targets, loss_mask):
+    def train(self, game_states: List[StateFeatures], targets: List[List[float]], loss_mask: List[int]) -> float:
         """
         Train the network with the given game and target values
-        games: list of game, each game contains t successive game states
-        targets: list of labels, each label contains t successive labels for a game
+        :param game_states: batch of game states
+        :param targets: the corrected Q values for each state in the batch
+        :param loss_mask: the action whose Q value needs to be learned for each state in batch
+        :return: average loss
         """
-        input_dict = {tensor: value for tensor, value in zip(self.inputs.game_state, games)}
-        input_dict[self.inputs.rnn_init_state] = rnn_init_state
+        game_states = Model.format_input_heads(game_states)
+        input_dict = {tensor: value for tensor, value in zip(self.inputs.game_state, game_states)}
         input_dict[self.inputs.loss_mask] = loss_mask
         input_dict[self.inputs.targets] = targets
         input_dict[self.inputs.is_training] = True
         loss, _ = self.sess.run([self.loss, self.train_step], feed_dict=input_dict)
         return loss
+
+    @staticmethod
+    def format_input_heads(game_states: List[StateFeatures]) -> StateFeatures:
+        """
+        :param game_states: batch of game states
+        :return: StateFeatures where each feature is the combined feature of the batch
+        """
+        return Model.StateFeatures(*zip(*game_states))
 
     def save_checkpoint(self, folder='checkpoint', filename='checkpoint.ckpt'):
         file_path = os.path.join(folder, filename)
