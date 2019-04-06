@@ -20,7 +20,7 @@ if __name__ == '__main__':
         # n_dense_before_rnn=1,
         # n_dense_after_rnn=1,
         n_hiddens=[512, 256, 128, 64],
-        n_outputs=Game.ACTIONS_PER_N_PLAYERS[n_players],
+        # n_outputs=Game.ACTIONS_PER_N_PLAYERS[n_players],
         learn_rate=3e-5,
         # dropout_rate=0.3,
         dropout_rates=[0, 0.3, 0.2, 0.1],

@@ -26,8 +26,6 @@ class Trainer:
         n_players = game_configs.n_players
         n_actions = Game.ACTIONS_PER_N_PLAYERS[n_players]
 
-        batch_size = train_configs.batch_size
-
         # -------------------------
         # models to train and experience _buffer
 
@@ -61,47 +59,6 @@ class Trainer:
         self.firework_eval = np.array(self.firework_eval)
         self.fuse_eval = np.array(self.fuse_eval)
 
-    @staticmethod
-    def one_hot_hint(hint):
-        return np.fromiter((1 if b1 and b2 else 0 for b1 in hint[1] for b2 in hint[0]),
-                           dtype=np.int8, count=Game.N_TYPES)
-
-    def extract_game_state(self, game, last_action):
-        """
-        Create n states (n = n_players), each is a game state from each player's point of view
-        """
-        n_players = game.n_players
-        remain_tiles = np.fromiter(game.n_tiles_per_type, dtype=np.int8, count=len(game.n_tiles_per_type))
-        # all_hints[player]
-        all_hands = [np.fromiter((tile.id for tile in hand), dtype=np.int8, count=game.hand_size)
-                     for hand in game.hands]
-        # all_hints[player][tile]
-        all_hints = [[Trainer.one_hot_hint(tile_hint) for tile_hint in player_hint] for player_hint in game.hints]
-        fireworks = np.fromiter(game.fireworks, dtype=np.int8, count=len(game.fireworks))
-
-        if game.is_over:
-            valid_mask_cur_player = self.valid_mask_none
-            valid_mask_other_player = self.valid_mask_none
-        else:
-            valid_mask_cur_player = np.fromiter((1 if x else 0 for x in game.is_valid_action),
-                                                dtype=np.int8, count=game.n_actions)
-            valid_mask_other_player = self.valid_mask_do_nothing
-
-        game_states = [None] * n_players
-        for p in range(n_players):
-            game_states[p] = Model.StateFeatures(
-                cur_player=(game.cur_player - p) % n_players,
-                remain_tiles=remain_tiles,
-                hands=[all_hands[i % n_players] for i in range(p + 1, p + n_players)],
-                hints=[all_hints[i % n_players] for i in range(p, p + n_players)],
-                n_hint_tokens=game.n_hint_tokens,
-                n_fuse_tokens=game.n_fuse_tokens,
-                fireworks=fireworks,
-                last_action=last_action,
-                valid_mask=valid_mask_cur_player if p == game.cur_player else valid_mask_other_player,
-            )
-        return game_states
-
     def play_batch(self, n_games, explore_rate):
         """
         Play a batch of games using the train_model neural network to select move
@@ -125,7 +82,7 @@ class Trainer:
             for i in range(n_games):
                 if games[i].is_over:
                     continue
-                cur_game_states = self.extract_game_state(games[i], last_actions[i])
+                cur_game_states = self.train_model.extract_features(games[i], last_actions[i])
                 for j in range(n_players):
                     time_series[i * n_players + j].append(cur_game_states[j])
 
@@ -158,7 +115,7 @@ class Trainer:
 
         # Add the terminal state
         for i, game in enumerate(games):
-            terminal_states = self.extract_game_state(game, last_actions[i])
+            terminal_states = self.train_model.extract_features(game, last_actions[i])
             for j in range(n_players):
                 time_series[i * n_players + j].append(terminal_states[j])
         return games, time_series
@@ -187,7 +144,7 @@ class Trainer:
         last_action = -1
 
         while not game.is_over:
-            game_states = self.extract_game_state(game, last_action)
+            game_states = self.train_model.extract_features(game, last_action)
             for p in range(game.n_players):
                 time_series[p].append(game_states[p])
 
@@ -199,7 +156,7 @@ class Trainer:
             last_action = action_ind
 
         # Add the terminal state
-        terminal_states = self.extract_game_state(game, last_action)
+        terminal_states = self.train_model.extract_features(game, last_action)
         for p in range(game.n_players):
             time_series[p].append(terminal_states[p])
 
@@ -387,7 +344,7 @@ class Trainer:
         last_action = -1
 
         while not game.is_over:
-            game_states = self.extract_game_state(game, last_action)
+            game_states = self.train_model.extract_features(game, last_action)
             [state_q] = self.train_model.predict([game_states[game.cur_player]])
 
             # display game

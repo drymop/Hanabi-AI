@@ -134,7 +134,7 @@ class Model(object):
         :param game_states:
         :return:
         """
-        game_states = Model.format_input_heads(game_states)
+        game_states = Model._format_input_heads(game_states)
         input_dict = {tensor: value for tensor, value in zip(self.inputs.game_state, game_states)}
         input_dict[self.inputs.is_training] = False
         action_prob = self.sess.run(self.action_probability, feed_dict=input_dict)
@@ -148,7 +148,7 @@ class Model(object):
         :param reward: normalized, discounted reward gained after applying action
         :return: average loss
         """
-        game_states = Model.format_input_heads(game_states)
+        game_states = Model._format_input_heads(game_states)
         input_dict = {tensor: value for tensor, value in zip(self.inputs.game_state, game_states)}
         input_dict[self.inputs.action] = action
         input_dict[self.inputs.reward] = reward
@@ -157,7 +157,7 @@ class Model(object):
         return loss
 
     @staticmethod
-    def format_input_heads(game_states: List[StateFeatures]) -> StateFeatures:
+    def _format_input_heads(game_states: List[StateFeatures]) -> StateFeatures:
         """
         :param game_states: batch of game states
         :return: StateFeatures where each feature is the combined feature of the batch
