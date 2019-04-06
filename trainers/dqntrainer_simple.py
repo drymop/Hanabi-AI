@@ -21,6 +21,8 @@ class Trainer:
         self.model_configs = model_configs
         self.train_configs = train_configs
 
+        Game.MAX_FUSES = self.game_configs.max_fuses
+
         n_players = game_configs.n_players
         n_actions = Game.ACTIONS_PER_N_PLAYERS[n_players]
 

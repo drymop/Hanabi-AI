@@ -12,17 +12,18 @@ if __name__ == '__main__':
         n_ranks=Game.N_RANKS,
         n_suits=Game.N_SUITS,
         hand_size=Game.HAND_SIZE_PER_N_PLAYERS[n_players],
+	max_fuses=25,
     )
     model_configs = AttributeDict(
         # n_rnn_hiddens=64,
         # n_rnn_layers=1,
         # n_dense_before_rnn=1,
         # n_dense_after_rnn=1,
-        n_hiddens=[500, 300],
+        n_hiddens=[512, 256, 128, 64],
         n_outputs=Game.ACTIONS_PER_N_PLAYERS[n_players],
-        learn_rate=1e-4,
+        learn_rate=3e-5,
         # dropout_rate=0.3,
-        dropout_rates=[0.3, 0.3],
+        dropout_rates=[0, 0.3, 0.2, 0.1],
     )
     train_configs = AttributeDict(
         save_folder=save_folder,
