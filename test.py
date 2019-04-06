@@ -1,5 +1,5 @@
 from game import Game
-from trainers.dqntrainer_rnn import Trainer
+from trainer.dqntrainer_rnn import Trainer
 from utils.attributedict import AttributeDict
 
 if __name__ == '__main__':
