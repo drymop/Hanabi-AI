@@ -1,3 +1,6 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
+
 from game import Game
 from trainer.dqntrainer import Trainer
 from utils.attributedict import AttributeDict
@@ -15,7 +18,6 @@ if __name__ == '__main__':
         max_fuses=10,
     )
     model_configs = AttributeDict(
-        device='/job:localhost/replica:0/task:0/device:GPU:1',
         # n_rnn_hiddens=64,
         # n_rnn_layers=1,
         # n_dense_before_rnn=1,

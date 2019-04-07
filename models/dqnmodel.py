@@ -37,12 +37,11 @@ class Model(object):
 
         # -------------------------
         # Define NN graph
-        with tf.device(model_configs.device):
-            self._define_graph()
+        self._define_graph()
 
         # ---------------------------------
         # Initialize graph
-        sess_config = tf.ConfigProto(allow_soft_placement=True)  # choose another if the specified device doesn't exist
+        sess_config = tf.ConfigProto()  # allow_soft_placement=True)
         sess_config.gpu_options.allow_growth = True  # not allow tf to use up all GPU memory, in case of sharing
         self.sess = tf.Session(graph=self.graph, config=sess_config)
         with tf.Session() as temp_sess:
