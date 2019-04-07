@@ -6,10 +6,6 @@ from typing import List
 
 from game import Game
 
-FEATURE_NAMES = ['cur_player', 'remain_tiles', 'hands', 'hints', 'n_hint_tokens', 'n_fuse_tokens',
-                 'fireworks', 'last_action', 'valid_mask']
-StateFeatures = namedtuple('StateFeatures', ' '.join(FEATURE_NAMES))
-
 
 class Model(object):
     """DQN model that takes in a Hanabi game state and output the Q value of each action, without any RNN"""
