@@ -12,10 +12,10 @@ if __name__ == '__main__':
         n_ranks=Game.N_RANKS,
         n_suits=Game.N_SUITS,
         hand_size=Game.HAND_SIZE_PER_N_PLAYERS[n_players],
-        max_fuses=25,
+        max_fuses=10,
     )
     model_configs = AttributeDict(
-        device='/device:GPU:1',
+        device='/job:localhost/replica:0/task:0/device:GPU:1',
         # n_rnn_hiddens=64,
         # n_rnn_layers=1,
         # n_dense_before_rnn=1,
@@ -41,7 +41,7 @@ if __name__ == '__main__':
         # help_rate=(0, 0, 0),
         discount_rate=0.95,
         firework_eval=(1, 0.5),
-        fuse_eval=(0.3, 0.1),
+        fuse_eval=(0.5, 0.2),
         hint_eval=5,
     )
 
