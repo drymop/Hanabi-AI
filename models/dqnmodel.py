@@ -24,16 +24,8 @@ class Model(object):
         self.model_configs = model_configs
         self.game_configs = game_configs
 
-        # model configs
-        n_hiddens = model_configs.n_hiddens
-        learn_rate = model_configs.learn_rate
-        dropout_rates = model_configs.dropout_rates
         # game configs
-        n_ranks = game_configs.n_ranks
-        n_suits = game_configs.n_suits
         n_players = game_configs.n_players
-        n_tile_types = n_ranks * n_suits
-        hand_size = game_configs.hand_size
         n_actions = Game.ACTIONS_PER_N_PLAYERS[n_players]
 
         # -------------------------
@@ -45,6 +37,36 @@ class Model(object):
 
         # -------------------------
         # Define NN graph
+        with tf.device(model_configs.device):
+            self._define_graph()
+
+        # ---------------------------------
+        # Initialize graph
+        sess_config = tf.ConfigProto(allow_soft_placement=True)  # choose another if the specified device doesn't exist
+        sess_config.gpu_options.allow_growth = True  # not allow tf to use up all GPU memory, in case of sharing
+        self.sess = tf.Session(graph=self.graph, config=sess_config)
+        with tf.Session() as temp_sess:
+            temp_sess.run(tf.global_variables_initializer())
+        self.sess.run(tf.variables_initializer(self.graph.get_collection('variables')))
+
+        # ---------------------------------
+        # Save and load operations
+        self.saver = tf.train.Saver(self.graph.get_collection('variables'), max_to_keep=10000000)
+
+    def _define_graph(self):
+        model_configs = self.model_configs
+        game_configs = self.game_configs
+        # model configs
+        n_hiddens = model_configs.n_hiddens
+        learn_rate = model_configs.learn_rate
+        dropout_rates = model_configs.dropout_rates
+        # game configs
+        n_ranks = game_configs.n_ranks
+        n_suits = game_configs.n_suits
+        n_players = game_configs.n_players
+        n_tile_types = n_ranks * n_suits
+        hand_size = game_configs.hand_size
+        n_actions = Game.ACTIONS_PER_N_PLAYERS[n_players]
         self.graph = tf.Graph()
         with self.graph.as_default():
             # -------------------------
@@ -123,19 +145,6 @@ class Model(object):
             update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
             with tf.control_dependencies(update_ops):
                 self.train_step = tf.train.AdamOptimizer(learn_rate).minimize(self.loss)
-
-        # ---------------------------------
-        # Initialize graph
-        sess_config = tf.ConfigProto()
-        sess_config.gpu_options.allow_growth = True  # not allow tf to use up all GPU memory, in case of sharing
-        self.sess = tf.Session(graph=self.graph, config=sess_config)
-        with tf.Session() as temp_sess:
-            temp_sess.run(tf.global_variables_initializer())
-        self.sess.run(tf.variables_initializer(self.graph.get_collection('variables')))
-
-        # ---------------------------------
-        # Save and load operations
-        self.saver = tf.train.Saver(self.graph.get_collection('variables'), max_to_keep=10000000)
 
     @staticmethod
     def _create_dense_layer(input_layer, n_outputs, activation_fn, dropout_rate, is_training):

@@ -12,9 +12,10 @@ if __name__ == '__main__':
         n_ranks=Game.N_RANKS,
         n_suits=Game.N_SUITS,
         hand_size=Game.HAND_SIZE_PER_N_PLAYERS[n_players],
-	max_fuses=25,
+        max_fuses=25,
     )
     model_configs = AttributeDict(
+        device='/device:GPU:1',
         # n_rnn_hiddens=64,
         # n_rnn_layers=1,
         # n_dense_before_rnn=1,
