@@ -56,11 +56,11 @@ class Model(object):
         learn_rate = model_configs.learn_rate
         dropout_rates = model_configs.dropout_rates
         # game configs
-        n_ranks = game_configs.n_ranks
-        n_suits = game_configs.n_suits
+        n_ranks = Game.N_RANKS
+        n_suits = Game.N_SUITS
         n_players = game_configs.n_players
         n_tile_types = n_ranks * n_suits
-        hand_size = game_configs.hand_size
+        hand_size = Game.HAND_SIZE_PER_N_PLAYERS[n_players]
         n_actions = Game.ACTIONS_PER_N_PLAYERS[n_players]
         self.graph = tf.Graph()
         with self.graph.as_default():

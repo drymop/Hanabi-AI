@@ -12,9 +12,6 @@ if __name__ == '__main__':
     n_players = 3
     game_configs = AttributeDict(
         n_players=n_players,
-        n_ranks=Game.N_RANKS,
-        n_suits=Game.N_SUITS,
-        hand_size=Game.HAND_SIZE_PER_N_PLAYERS[n_players],
         max_fuses=10,
     )
     model_configs = AttributeDict(
@@ -23,16 +20,13 @@ if __name__ == '__main__':
         # n_dense_before_rnn=1,
         # n_dense_after_rnn=1,
         n_hiddens=[512, 256, 128, 64],
-        # n_outputs=Game.ACTIONS_PER_N_PLAYERS[n_players],
         learn_rate=3e-5,
-        # dropout_rate=0.3,
         dropout_rates=[0, 0.3, 0.2, 0.1],
     )
     train_configs = AttributeDict(
         save_folder=save_folder,
         buffer_size=16384,
         buffer_prob_scale=5,
-        # weighted_buffer=True,
         n_games_per_iter=512,
         n_validation_games_per_iter=128,
         update_target_model_every_n_iter=10,

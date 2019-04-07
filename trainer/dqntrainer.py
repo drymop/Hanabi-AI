@@ -7,7 +7,7 @@ import time
 from typing import List
 
 from game import Game
-from models.dqnmodel import Model
+from model.dqnmodel import Model
 from utils.consoledisplay import display_action, display_state
 from utils.weightedexpbuffer import Experience, ExperienceBuffer
 
@@ -27,7 +27,7 @@ class Trainer:
         n_actions = Game.ACTIONS_PER_N_PLAYERS[n_players]
 
         # -------------------------
-        # models to train and experience _buffer
+        # model to train and experience _buffer
 
         self.train_model = Model(game_configs, model_configs)
         # model used during training iteration while train_model is being updated

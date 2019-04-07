@@ -6,7 +6,7 @@ import random
 import time
 
 from game import Game
-from models.dqnmodel_rnn import Model
+from model.dqnmodel_rnn import Model
 from utils.consoledisplay import display_action, display_state
 from utils.shitexpbuffer import Experience, ExperienceBuffer
 
@@ -28,7 +28,7 @@ class Trainer:
         batch_size = train_configs.batch_size
 
         # -------------------------
-        # models to train and experience _buffer
+        # model to train and experience _buffer
 
         self.train_model = Model(game_configs, model_configs)
         # model used during training iteration while train_model is being updated
