@@ -5,17 +5,11 @@ from game import Game
 
 
 class RandomPlayer:
-    def __init__(self, n_players, prob: List[float] = None):
-        self.n_actions = Game.ACTIONS_PER_N_PLAYERS[n_players] - 1  # exclude doing nothing
-        self.prob = prob
-
-    def get_action(self, game: Game = None):
-        return np.random.choice(self.n_actions, p=self.prob)
+    def get_action(self, game: Game):
+        choices = [i for i in range(game.n_actions) if game.is_valid_action[i]]
+        return np.random.choice(choices)
 
 
-class RandomNoHintPlayer:
-    def __init__(self, n_players):
-        self.n_actions = Game.HAND_SIZE_PER_N_PLAYERS[n_players]
-
-    def get_action(self, game: Game = None):
-        return np.random.choice(self.n_actions)
+class RandomOnlyPlayPlayer:
+    def get_action(self, game):
+        return np.random.choice(game.hand_size)
