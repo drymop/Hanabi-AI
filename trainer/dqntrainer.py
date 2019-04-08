@@ -71,7 +71,7 @@ class Trainer:
 
         # 2d array of state, recording the time series of each player for each game
         # (aka the time series of player j of game i is stored at index (i*n_players + j)
-        time_series = [[] for _ in range(batch_size)]
+        time_series = [[] for _ in range(batch_size)]  # type: List[List[Model.StateFeatures]]
         games = [Game(n_players) for _ in range(n_games)]
         # for game in games:  # vary the number of fuse to start with
         #     game.n_fuse_tokens = random.randrange(1, Game.MAX_FUSES + 1)
@@ -82,7 +82,7 @@ class Trainer:
             for i in range(n_games):
                 if games[i].is_over:
                     continue
-                cur_game_states = self.train_model.extract_features(games[i], last_actions[i])
+                cur_game_states = self.train_model.extract_features(games[i])
                 for j in range(n_players):
                     time_series[i * n_players + j].append(cur_game_states[j])
 
@@ -115,7 +115,7 @@ class Trainer:
 
         # Add the terminal state
         for i, game in enumerate(games):
-            terminal_states = self.train_model.extract_features(game, last_actions[i])
+            terminal_states = self.train_model.extract_features(game)
             for j in range(n_players):
                 time_series[i * n_players + j].append(terminal_states[j])
         return games, time_series
@@ -141,10 +141,9 @@ class Trainer:
         n_players = self.game_configs.n_players
         game = Game(n_players)
         time_series = [[] for _ in range(n_players)]  # 2d array of state, recording the time series of each player
-        last_action = -1
 
         while not game.is_over:
-            game_states = self.train_model.extract_features(game, last_action)
+            game_states = self.train_model.extract_features(game)
             for p in range(game.n_players):
                 time_series[p].append(game_states[p])
 
@@ -153,10 +152,9 @@ class Trainer:
             action_ind = random.choice(choices)
             action = game.actions[action_ind]
             game.play(action)
-            last_action = action_ind
 
         # Add the terminal state
-        terminal_states = self.train_model.extract_features(game, last_action)
+        terminal_states = self.train_model.extract_features(game)
         for p in range(game.n_players):
             time_series[p].append(terminal_states[p])
 
@@ -341,10 +339,9 @@ class Trainer:
     def test(self):
         n_players = self.game_configs.n_players
         game = Game(n_players)
-        last_action = -1
 
         while not game.is_over:
-            game_states = self.train_model.extract_features(game, last_action)
+            game_states = self.train_model.extract_features(game)
             [state_q] = self.train_model.predict([game_states[game.cur_player]])
 
             # display game
@@ -370,7 +367,6 @@ class Trainer:
             display_action(game, action)
 
             game.play(action)
-            last_action = action_id
             input()
 
     @staticmethod

@@ -15,8 +15,9 @@ class ActionType(Enum):
 
 
 class Action(object):
-    def __init__(self, action_type):
+    def __init__(self, action_type, action_id):
         self.type = action_type
+        self.action_id = action_id
 
 
 class Game(object):
@@ -82,30 +83,36 @@ class Game(object):
 
         # actions players can take
         self.actions = []
+        action_id = 0
         for i in range(self.hand_size):
-            ac = Action(ActionType.PLAY)
+            ac = Action(ActionType.PLAY, action_id)
+            action_id += 1
             ac.target_tile = i
             self.actions.append(ac)
         for i in range(self.hand_size):
-            ac = Action(ActionType.DISCARD)
+            ac = Action(ActionType.DISCARD, action_id)
+            action_id += 1
             ac.target_tile = i
             self.actions.append(ac)
         for p in range(1, self.n_players):
             for r in Game.RANKS:
-                ac = Action(ActionType.HINT)
+                ac = Action(ActionType.HINT, action_id)
+                action_id += 1
                 ac.target_player = p
                 ac.hint_attribute = r
                 ac.hint_is_suit = False
                 self.actions.append(ac)
             for c in Game.SUITS:
-                ac = Action(ActionType.HINT)
+                ac = Action(ActionType.HINT, action_id)
+                action_id += 1
                 ac.target_player = p
                 ac.hint_attribute = c
                 ac.hint_is_suit = True
                 self.actions.append(ac)
-        self.actions.append(Action(ActionType.NONE))  # do nothing
+        self.actions.append(Action(ActionType.NONE, action_id))  # do nothing
         self.n_actions = Game.ACTIONS_PER_N_PLAYERS[self.n_players]
 
+        self.last_action = -1
         # whether game is over or not
         self.is_over = False
 
@@ -154,6 +161,7 @@ class Game(object):
             raise ValueError("Expected action type to be 'PLAY', 'DISCARD' or 'HINT'; got '%r'" % action.type)
         
         # move to next player
+        self.last_action = action.action_id
         self.n_turns += 1
         self.cur_player = (self.cur_player + 1) % self.n_players
         self.is_over = self.n_fuse_tokens <= 0 or self.deck_size <= 0 or self.score == Game.MAX_SCORE

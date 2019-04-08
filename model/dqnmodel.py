@@ -155,7 +155,7 @@ class Model(object):
         return np.fromiter((1 if b1 and b2 else 0 for b1 in hint[1] for b2 in hint[0]),
                            dtype=np.int8, count=Game.N_TYPES)
 
-    def extract_features(self, game: Game, last_action: int = -1):
+    def extract_features(self, game: Game):
         """
         Create n states (n = n_players), each is a game state from each player's point of view
         """
@@ -186,7 +186,7 @@ class Model(object):
                 n_hint_tokens=game.n_hint_tokens,
                 n_fuse_tokens=game.n_fuse_tokens,
                 fireworks=fireworks,
-                last_action=last_action,
+                last_action=game.last_action,
                 valid_mask=valid_mask_cur_player if p == game.cur_player else valid_mask_other_player,
             )
         return game_states
