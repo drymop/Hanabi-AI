@@ -5,12 +5,11 @@ from typing import List
 from game import Game
 from model.dqnmodel import Model
 from player.base import Player
-from trainer.dqntrainer import Trainer
 from utils.attributedict import AttributeDict
 
 
 class DQNPlayer(Player):
-    def __init__(self, model: Model = None, load_folder: str = '', iteration: int = -1):
+    def __init__(self, model: Model = None, load_folder: str = '', file_name: str = ''):
         if model:
             self.model = model
         else:
@@ -21,7 +20,7 @@ class DQNPlayer(Player):
             model_configs = configs.model_configs
 
             self.model = Model(game_configs, model_configs)
-            self.model.load_checkpoint(load_folder, filename=Trainer.checkpoint_file_name(iteration))
+            self.model.load_checkpoint(load_folder, filename=file_name)
 
     def get_action(self, game: Game) -> int:
         state = self.model.extract_features(game)[game.cur_player]
