@@ -8,6 +8,9 @@ from typing import List
 
 from game import Game
 from model.dqnmodel import Model
+from player.dqn import DQNPlayer
+from player.random import RandomPlayer
+from player.safe import SafePlayer
 from utils.consoledisplay import display_action, display_state
 from utils.weightedexpbuffer import Experience, ExperienceBuffer
 
@@ -59,15 +62,20 @@ class Trainer:
         self.firework_eval = np.array(self.firework_eval)
         self.fuse_eval = np.array(self.fuse_eval)
 
-    def play_batch(self, n_games, explore_rate):
+    def play_batch(self, n_games, explore_rate, guide_rate):
         """
         Play a batch of games using the train_model neural network to select move
         :param n_games: number of games
         :param explore_rate: probability that a move is chosen randomly (instead of choosing the best move)
+        :param guide_rate: probability that a move is chosen using heuristic (instead of choosing the best move from NN)
         :return: list of games played and list of time series
         """
         n_players = self.game_configs.n_players
         batch_size = n_games * n_players
+
+        random_player = RandomPlayer()
+        safe_player = SafePlayer()
+        dqn_player = DQNPlayer(self.train_model)
 
         # 2d array of state, recording the time series of each player for each game
         # (aka the time series of player j of game i is stored at index (i*n_players + j)
@@ -75,7 +83,6 @@ class Trainer:
         games = [Game(n_players) for _ in range(n_games)]
         # for game in games:  # vary the number of fuse to start with
         #     game.n_fuse_tokens = random.randrange(1, Game.MAX_FUSES + 1)
-        last_actions = [-1] * n_games
 
         while not all(g.is_over for g in games):
             # extract game state per player per game into each time series
@@ -86,32 +93,22 @@ class Trainer:
                 for j in range(n_players):
                     time_series[i * n_players + j].append(cur_game_states[j])
 
-            # use NN to figure out Q values for each current game state
-            cur_game_states = [ts[-1] for ts in time_series]  # last state of each time series
-            batch_q = self.train_model.predict(cur_game_states)
+            # use NN to figure out best actions for each current game state
+            batch_actions = dqn_player.get_batch_actions(games)
 
             # choose action for each game based on Q values obtained (and exploration rate)
             for i, game in enumerate(games):
                 if game.is_over:
                     continue
-                state_q = batch_q[i * n_players + game.cur_player]
                 rand_number = random.random()
-                if rand_number > explore_rate:
-                    # choose best action among the heuristically allowed actions
-                    forbidden_choices = Trainer.heuristic_forbidden_choices(game)
-                    for action_id in forbidden_choices:
-                        state_q[action_id] = -128
-                    best_q = max(state_q[j] for j in range(game.n_actions) if game.is_valid_action[j])
-                    choices = [j for j in range(game.n_actions) if state_q[j] == best_q and game.is_valid_action[j]]
-                else:
-                    # explore - choose a random action
-                    forbidden_choices = Trainer.heuristic_forbidden_choices(game)
-                    choices = [j for j in range(game.n_actions) if
-                               game.is_valid_action[j] and j not in forbidden_choices]
-                action_id = random.choice(choices)
+                if rand_number < explore_rate:  # explore
+                    action_id = random_player.get_action(game)
+                elif rand_number < explore_rate + guide_rate:  # guide
+                    action_id = safe_player.get_action(game)
+                else:  # dqn
+                    action_id = batch_actions[i]
                 action = game.actions[action_id]
                 game.play(action)
-                last_actions[i] = action_id
 
         # Add the terminal state
         for i, game in enumerate(games):
@@ -119,19 +116,6 @@ class Trainer:
             for j in range(n_players):
                 time_series[i * n_players + j].append(terminal_states[j])
         return games, time_series
-
-    @staticmethod
-    def heuristic_forbidden_choices(game):
-        # non_playable = []
-        # for j, tile in enumerate(game.hands[game.cur_player]):
-        #     if game.fireworks[tile.suit] == tile.rank \
-        #             and game.hints[game.cur_player][j][0].count(True) == 1 \
-        #             and game.hints[game.cur_player][j][1].count(True) == 1:
-        #         non_playable.append(game.hand_size + j)  # surely playable, should not discard
-        #     else:
-        #         non_playable.append(j)  # not surely playable, do not play
-        # return non_playable
-        return []  # nothing is forbidden
 
     def play_random(self):
         """Play a game randomly and return the episode.
@@ -264,6 +248,8 @@ class Trainer:
 
         explore_rate_start, explore_rate_end, explore_rate_decrease = self.train_configs.explore_rate
         explore_rate = explore_rate_start
+        guide_rate_start, guide_rate_end, guide_rate_decrease = self.train_configs.guide_rate
+        guide_rate = guide_rate_start
         n_sample_games = self.train_configs.n_games_per_iter
         n_validation_games = self.train_configs.n_validation_games_per_iter
         # do iterations 0 -> infinity
@@ -273,7 +259,7 @@ class Trainer:
             print('explore rate: {}'.format(explore_rate))
 
             # create sample games by playing with exploration on
-            games, batch_time_series = self.play_batch(n_sample_games, explore_rate=explore_rate)
+            games, batch_time_series = self.play_batch(n_sample_games, explore_rate=explore_rate, guide_rate=guide_rate)
             # add sample games to experience _buffer
             sample_eval = 0
             for time_series in batch_time_series:
@@ -293,7 +279,7 @@ class Trainer:
                   .format(sample_score, sample_eval, sample_deaths, sample_turns))
 
             # create validation games by playing with exploration off, these games are not added to experience _buffer
-            games, batch_time_series = self.play_batch(n_validation_games, explore_rate=0)
+            games, batch_time_series = self.play_batch(n_validation_games, explore_rate=0, guide_rate=0)
             # print statistics
             valid_score = sum(game.score for game in games) / n_validation_games
             valid_eval = sum(self.eval_game_state(ts[-1]) for ts in batch_time_series) / len(batch_time_series)
@@ -321,6 +307,7 @@ class Trainer:
 
             # update iteration related variables
             explore_rate = max(explore_rate - explore_rate_decrease, explore_rate_end)
+            guide_rate = max(guide_rate - guide_rate_decrease, guide_rate_end)
 
     def eval_game_state(self, game_state):
         # return sum(self.firework_eval[x] for x in game_state.fireworks)

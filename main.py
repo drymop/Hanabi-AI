@@ -8,7 +8,7 @@ if __name__ == '__main__':
     n_players = 3
     game_configs = AttributeDict(
         n_players=n_players,
-        max_fuses=10,
+        max_fuses=3,
     )
     model_configs = AttributeDict(
         # n_rnn_hiddens=64,
@@ -17,7 +17,7 @@ if __name__ == '__main__':
         # n_dense_after_rnn=1,
         n_hiddens=[512, 256, 128, 64],
         learn_rate=3e-5,
-        dropout_rates=[0, 0.3, 0.2, 0.1],
+        dropout_rates=[0, 0.3, 0.5, 0.3],
     )
     train_configs = AttributeDict(
         save_folder=save_folder,
@@ -29,8 +29,8 @@ if __name__ == '__main__':
         batch_size=128,
         # time_steps=8,
         n_epochs_per_iter=128,
-        explore_rate=(1, 0.1, 0.001),
-        # help_rate=(0, 0, 0),
+        explore_rate=(0.05, 0.05, 0),
+        guide_rate=(0.95, 0, 0.001),
         discount_rate=0.95,
         firework_eval=(1, 0.5),
         fuse_eval=(0.5, 0.2),

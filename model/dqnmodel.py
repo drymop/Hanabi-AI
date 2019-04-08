@@ -24,14 +24,14 @@ class Model(object):
         n_players = game_configs.n_players
         n_actions = Game.ACTIONS_PER_N_PLAYERS[n_players]
 
-        # -------------------------
+        # ---------------------------------
         # Precomputed neural network's inputs (for extracting states from Game)
         # various valid masks for a game state
         self.valid_mask_none = np.zeros(n_actions)  # none of the actions are valid
         self.valid_mask_do_nothing = np.zeros(n_actions)  # only the last action is valid (do nothing)
         self.valid_mask_do_nothing[-1] = 1
 
-        # -------------------------
+        # ---------------------------------
         # Define NN graph
         self._define_graph()
 
@@ -47,6 +47,13 @@ class Model(object):
         # ---------------------------------
         # Save and load operations
         self.saver = tf.train.Saver(self.graph.get_collection('variables'), max_to_keep=10000000)
+
+        # ---------------------------------
+        # Load from checkpoint if specified
+        if 'load' in model_configs:
+            load_folder = model_configs.load.folder
+            load_file = model_configs.load.file
+            self.load_checkpoint(load_folder, load_file)
 
     def _define_graph(self):
         model_configs = self.model_configs
