@@ -1,9 +1,10 @@
 import numpy as np
 
 from game import Game
+from player.base import Player
 
 
-class SafePlayer:
+class SafePlayer(Player):
     def get_action(self, game: Game):
         # if there is a tile that is surely playable (based solely on hint), play it
         can_play = []
