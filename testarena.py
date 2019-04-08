@@ -13,8 +13,8 @@ if __name__ == '__main__':
     load_iter = 79180
     player = DQNPlayer(load_dir, load_iter)
 
-    print('Player: dqn, dqn, dqn')
-    print('Play %d games' % n_games)
+    print('Player: dqn')
+    print('Max fuses: %d' % Game.MAX_FUSES)
     games, action_freqs = play_batch(n_players=n_players, players=player, n_games=n_games)
 
     turns = [g.n_turns for g in games]
