@@ -5,6 +5,7 @@ from game import Game
 from player.dqn import DQNPlayer
 
 if __name__ == '__main__':
+    Game.MAX_FUSES = 25
     n_players = 3
     n_games = 10000
 
@@ -22,16 +23,11 @@ if __name__ == '__main__':
     scores = [sum(g.fireworks) for g in games]
     print('Score: %.2f +/- %.2f' % (np.average(scores), np.std(scores)))
 
-    print('Action freq:')
-    for i, freq in enumerate(action_freqs):
-        print('Player %d' % (i+1))
-        freq = [x / n_games for x in freq]
-        format = '%5.2f ' * len(freq)
-        print(format % tuple(freq))
-    print('Avg player')
-    freq = [sum(x) / n_players / n_games for x in zip(*action_freqs)]
-    format = '%5.2f ' * len(freq)
-    print(format % tuple(freq))
-
     deaths = [Game.MAX_FUSES - g.n_fuse_tokens for g in games]
     print('Deaths: %.2f +/- %.2f' % (np.average(deaths), np.std(deaths)))
+
+    print('Action freq:')
+    freq = [sum(x) / n_players / n_games for x in zip(*action_freqs)]
+    format = '%5.1f ' * len(freq)
+    print(format % tuple(freq))
+
