@@ -1,6 +1,7 @@
 import numpy as np
 
 from arena import play_batch
+from game import Game
 from player.dqn import DQNPlayer
 
 if __name__ == '__main__':
@@ -32,5 +33,5 @@ if __name__ == '__main__':
     format = '%5.2f ' * len(freq)
     print(format % tuple(freq))
 
-    deaths = [sum(g.n_fuse_tokens) for g in games]
-    print('Deaths: %.2f +/- %.2f' % (Game.MAX_FUSES - np.average(deaths), np.std(deaths)))
+    deaths = [Game.MAX_FUSES - g.n_fuse_tokens for g in games]
+    print('Deaths: %.2f +/- %.2f' % (np.average(deaths), np.std(deaths)))
