@@ -61,4 +61,5 @@ class SafePlayer:
             hint_action_ind_start += n_hint_attributes
 
         # no player has any playable tile, do a random non-play action
-        return np.random.randint(game.hand_size, game.n_actions)
+        choices = [i for i in range(game.hand_size, game.n_actions) if game.is_valid_action[i]]
+        return np.random.choice(choices)
