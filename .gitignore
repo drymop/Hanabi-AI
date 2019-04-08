@@ -2,3 +2,5 @@ __*
 .idea
 results/*
 save*
+test*
+!*.py

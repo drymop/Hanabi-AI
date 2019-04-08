@@ -1,7 +1,3 @@
-import os
-os.environ["CUDA_VISIBLE_DEVICES"]="1"
-
-from game import Game
 from trainer.dqntrainer import Trainer
 from utils.attributedict import AttributeDict
 

@@ -32,7 +32,8 @@ class DQNPlayer(Player):
         batch_action = [self.select_action_from_q(game, q_values) for game, q_values in zip(games, batch_q)]
         return batch_action
 
-    def select_action_from_q(self, game: Game, q_values: List[float]) -> int:
+    @staticmethod
+    def select_action_from_q(game: Game, q_values: List[float]) -> int:
         max_q = max(q for i, q in enumerate(q_values) if game.is_valid_action[i])
         choices = [i for i, q in enumerate(q_values) if q == max_q and game.is_valid_action[i]]
         if not choices:
