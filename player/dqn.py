@@ -10,14 +10,18 @@ from utils.attributedict import AttributeDict
 
 
 class DQNPlayer(Player):
-    def __init__(self, load_folder: str, iteration: int):
-        with open(load_folder + '/configs.json', 'r') as f:
-            configs = json.load(f, object_pairs_hook=AttributeDict)
-        game_configs = configs.game_configs
-        model_configs = configs.model_configs
+    def __init__(self, model: Model = None, load_folder: str = '', iteration: int = -1):
+        if model:
+            self.model = model
+        else:
+            # load from file
+            with open(load_folder + '/configs.json', 'r') as f:
+                configs = json.load(f, object_pairs_hook=AttributeDict)
+            game_configs = configs.game_configs
+            model_configs = configs.model_configs
 
-        self.model = Model(game_configs, model_configs)
-        self.model.load_checkpoint(load_folder, filename=Trainer.checkpoint_file_name(iteration))
+            self.model = Model(game_configs, model_configs)
+            self.model.load_checkpoint(load_folder, filename=Trainer.checkpoint_file_name(iteration))
 
     def get_action(self, game: Game) -> int:
         state = self.model.extract_features(game)[game.cur_player]

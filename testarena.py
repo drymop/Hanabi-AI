@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
     load_dir = 'save36_deep25fuse'
     load_iter = 79180
-    player = DQNPlayer(load_dir, load_iter)
+    player = DQNPlayer(load_folder=load_dir, iteration=load_iter)
 
     print('Player: dqn')
     print('Max fuses: %d' % Game.MAX_FUSES)
@@ -28,6 +28,8 @@ if __name__ == '__main__':
 
     print('Action freq:')
     freq = [sum(x) / n_players / n_games for x in zip(*action_freqs)]
-    format = '%5.1f ' * len(freq)
+    ind_format = '%4d' * len(freq)
+    print(ind_format % tuple(i for i in range(len(freq))))
+    format = '%4.1f' * len(freq)
     print(format % tuple(freq))
 
