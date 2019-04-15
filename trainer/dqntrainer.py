@@ -240,9 +240,10 @@ class Trainer:
                 print('score: {}'.format(avg_score / games_played))
                 print('eval : {}'.format(avg_eval / games_played))
                 print('turn : {}'.format(avg_turns / games_played))
-        print('score: {}'.format(avg_score / n_random_games))
-        print('eval : {}'.format(avg_eval / n_random_games))
-        print('turn : {}'.format(avg_turns / n_random_games))
+        if n_random_games != 0:
+            print('score: {}'.format(avg_score / n_random_games))
+            print('eval : {}'.format(avg_eval / n_random_games))
+            print('turn : {}'.format(avg_turns / n_random_games))
 
         # -------------------------
         # start training
