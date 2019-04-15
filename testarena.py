@@ -5,13 +5,13 @@ from game import Game
 from player.dqn import DQNPlayer
 
 if __name__ == '__main__':
-    Game.MAX_FUSES = 25
+    Game.MAX_FUSES = 3
     n_players = 3
     n_games = 10000
 
-    load_dir = 'save36_deep25fuse'
-    load_iter = 79180
-    player = DQNPlayer(load_folder=load_dir, iteration=load_iter)
+    load_dir = 'save39_high3fusepen'
+    load_iter = 33710
+    player = DQNPlayer(load_folder=load_dir, file_name=str(load_iter)+'.ckpt')
 
     print('Player: dqn')
     print('Max fuses: %d' % Game.MAX_FUSES)
