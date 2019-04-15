@@ -222,7 +222,8 @@ class Trainer:
         avg_eval = 0
         avg_turns = 0
         n_random_games = self.train_configs.buffer_size // self.game_configs.n_players // 2  # fill half of the _buffer
-        # n_random_games = 1
+        if 'n_fill_buffer' in self.train_configs:
+            n_random_games = self.train_configs.n_fill_buffer;
 
         for i in range(n_random_games):
             game, time_series = self.play_random()
