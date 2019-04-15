@@ -6,6 +6,7 @@ from game import Game
 from model.dqnmodel import Model
 from player.base import Player
 from utils.attributedict import AttributeDict
+from utils.consoledisplay import display_action_distribution
 
 
 class DQNPlayer(Player):
@@ -22,11 +23,13 @@ class DQNPlayer(Player):
             self.model = Model(game_configs, model_configs)
             self.model.load_checkpoint(load_folder, filename=file_name)
 
-    def get_action(self, game: Game) -> int:
+    def get_action(self, game: Game, verbose: bool = False) -> int:
         state = self.model.extract_features(game)[game.cur_player]
         [q_values] = self.model.predict([state])
         max_q = max(q for i, q in enumerate(q_values) if game.is_valid_action[i])
         choices = [i for i, q in enumerate(q_values) if q == max_q and game.is_valid_action[i]]
+        if verbose:
+            display_action_distribution(q_values)
         return np.random.choice(choices)
 
     def get_batch_actions(self, games: List[Game]) -> List[int]:

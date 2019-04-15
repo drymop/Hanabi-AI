@@ -5,7 +5,7 @@ from player.base import Player
 
 
 class SafePlayer(Player):
-    def get_action(self, game: Game):
+    def get_action(self, game: Game, verbose: bool = False):
         # if there is a tile that is surely playable (based solely on hint), play it
         can_play = []
         for i, tile in enumerate(game.hands[game.cur_player]):  # for each

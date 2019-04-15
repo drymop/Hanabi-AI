@@ -5,7 +5,7 @@ from player.base import Player
 
 
 class RandomPlayer(Player):
-    def get_action(self, game: Game) -> int:
+    def get_action(self, game: Game, verbose: bool = False) -> int:
         choices = [i for i in range(game.n_actions) if game.is_valid_action[i]]
         if not choices:
             return -1

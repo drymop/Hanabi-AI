@@ -1,3 +1,5 @@
+from typing import List
+
 from game import ActionType
 from game import Game
 
@@ -5,7 +7,7 @@ RANKS = ('1', '2', '3', '4', '5')
 COLORS = ('B', 'G', 'R', 'W', 'Y')
 
 
-def display_state(game: Game, first_person=True):
+def display_state(game: Game, first_person=False):
     n = game.n_players
     s = game.hand_size
 
@@ -70,3 +72,9 @@ def display_action(game: Game, action):
         print('Hint player {} of all {} tiles'.format(target, attr))
     else:
         print('Unknown action')
+
+def display_action_distribution(distr: List[float], col_width: int = 5, n_decimals: int = 1):
+    ind_format = ('%' + str(col_width) + 'd') * len(distr)
+    print(ind_format % tuple(i for i in range(len(distr))))
+    format = ('%' + str(col_width) + '.' + str(n_decimals) + 'f') * len(distr)
+    print(format % tuple(distr))
