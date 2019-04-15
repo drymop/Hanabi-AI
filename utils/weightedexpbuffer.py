@@ -31,6 +31,6 @@ class ExperienceBuffer:
     def _calculate_unnormalized_probability(self, reward):
         return abs(reward) * self._buffer_prob_scale + 1
 
-    def sample(self, size: int = 1) -> List[Experience]:
+    def sample(self, size = 1):
         normalized_prob = self._unnormalized_prob / sum(self._unnormalized_prob)
         return np.random.choice(self._buffer, size=size, p=normalized_prob)

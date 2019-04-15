@@ -160,10 +160,8 @@ class Trainer:
         avg_loss = 0
         avg_reward = 0
         avg_abs_reward = 0
-        for epoch in range(n_epochs):
-            # get experiences
-            batch = self.experience_buffer.sample(batch_size)  # batch: list of experiences (state, next_state, reward)
-
+        batches = self.experience_buffer.sample(size=(n_epochs, batch_size))
+        for batch in batches:
             # Q values for each 2nd state from the batch, shape=(batch_size, n_actions)
             next_states = [exp.next_state for exp in batch]
             next_q = self.target_model.predict(next_states)
@@ -223,7 +221,7 @@ class Trainer:
         avg_turns = 0
         n_random_games = self.train_configs.buffer_size // self.game_configs.n_players // 2  # fill half of the _buffer
         if 'n_fill_buffer' in self.train_configs:
-            n_random_games = self.train_configs.n_fill_buffer;
+            n_random_games = self.train_configs.n_fill_buffer
 
         for i in range(n_random_games):
             game, time_series = self.play_random()
