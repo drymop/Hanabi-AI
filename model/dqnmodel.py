@@ -53,6 +53,7 @@ class Model(object):
         if 'load' in model_configs:
             load_folder = model_configs.load.folder
             load_file = model_configs.load.file
+            print('Load model from %s/%s' % (load_folder, load_file))
             self.load_checkpoint(load_folder, load_file)
 
     def _define_graph(self):
