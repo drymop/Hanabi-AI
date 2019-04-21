@@ -4,8 +4,33 @@ from game import Game
 from player.base import Player
 
 
-class SafePlayer(Player):
+class SafeRandomHintPlayer(Player):
     def get_action(self, game: Game, verbose: bool = False):
+        if game.is_over:
+            return None
+        # if there is a tile that is surely playable (based solely on hint), play it
+        can_play = []
+        for i, tile in enumerate(game.hands[game.cur_player]):  # for each
+            if game.fireworks[tile.suit] == tile.rank \
+                    and game.hints[game.cur_player][i][0].count(True) == 1 \
+                    and game.hints[game.cur_player][i][1].count(True) == 1:
+                can_play.append(i)
+        if can_play:
+            return np.random.choice(can_play)
+
+        # otherwise, if there is no hint token, discard a random tile
+        if game.n_hint_tokens == 0:
+            return np.random.randint(game.hand_size, game.hand_size * 2)  # discard actions are in this range
+
+        # otherwise, hint a random attribute
+        hint_actions = [i for i in range(game.hand_size * 2, game.n_actions) if game.is_valid_action[i]]
+        return np.random.choice(hint_actions)
+
+
+class SafeSmartHintPlayer(Player):
+    def get_action(self, game: Game, verbose: bool = False):
+        if game.is_over:
+            return None
         # if there is a tile that is surely playable (based solely on hint), play it
         can_play = []
         for i, tile in enumerate(game.hands[game.cur_player]):  # for each

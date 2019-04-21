@@ -10,7 +10,7 @@ from game import Game
 from model.dqnmodel import Model
 from player.dqn import DQNPlayer
 from player.random import RandomPlayer
-from player.safe import SafePlayer
+from player.safe import SafeSmartHintPlayer
 from utils.consoledisplay import display_action, display_state
 from utils.weightedexpbuffer import Experience, ExperienceBuffer
 
@@ -74,7 +74,7 @@ class Trainer:
         batch_size = n_games * n_players
 
         random_player = RandomPlayer()
-        safe_player = SafePlayer()
+        safe_player = SafeSmartHintPlayer()
         dqn_player = DQNPlayer(self.train_model)
 
         # 2d array of state, recording the time series of each player for each game
