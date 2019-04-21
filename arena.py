@@ -38,7 +38,7 @@ def play_batch(n_players: int, players: Union[Player, List[Player]], n_games: in
                         if success:
                             play_unknown_success += 1
                         else:
-                            play_known_fail += 1
+                            play_unknown_fail += 1
                     elif pos_suits > 1 or pos_ranks > 1:
                         if success:
                             play_partial_success += 1
